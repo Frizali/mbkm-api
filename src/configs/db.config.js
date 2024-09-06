@@ -6,10 +6,10 @@ const db = {
     password: env.DB_PASSWORD,
     database: env.DB_NAME || 'programming_languages',
     port: env.DB_PORT || 3306,
-    ssl: {
-      mode: 'VERIFY_IDENTITY',
-      ca: fs.readFileSync('/etc/ssl/cert.pem', 'utf-8'),
-    }
+    // ssl: {
+    //   mode: 'VERIFY_IDENTITY',
+    //   ca: fs.readFileSync('/etc/ssl/cert.pem', 'utf-8'),
+    // }
 };
 
 module.exports = db;

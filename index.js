@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors'); 
 const app = express();
-const port = process.env.PORT || 3000;
-const programmingLanguagesRouter = require('./src/routes/programmingLanguages.route');
+const port = process.env.PORT || 3001;
 
 app.use(bodyParser.json());
 app.use(
@@ -11,11 +11,15 @@ app.use(
   })
 );
 
-app.get('/', (req, res) => {
-  res.json({'message': 'ok'});
-})
+app.use('/api',cors(),require('./src/routes/routes'))
 
-app.use('/programming-languages', programmingLanguagesRouter);
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+}));
+
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {
