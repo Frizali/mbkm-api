@@ -61,7 +61,7 @@ let menus = [
     icon: "<DescriptionOutlinedIcon />",
     index: false,
     parentId: 3,
-    element: null,
+    element: "<Submission />",
   },
   {
     menuId: 6,
