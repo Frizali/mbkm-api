@@ -1,9 +1,7 @@
-const db = require("./db.service");
-const helper = require("../utils/helper.util");
-const config = require("../configs/general.config");
+const menuRepo = require("../repository/menu.repository");
 
   
-let access = [
+let access1 = [
   { accessId: 1, accDescriptin: "Mahasiswa" },
   { accessId: 2, accDescriptin: "Tata Usaha" },
   { accessId: 3, accDescriptin: "Dosen Wali" },
@@ -12,74 +10,74 @@ let access = [
   { accessId: 6, accDescriptin: "Dosen Pembimbing" },
 ];
 
-let menus = [
+let menus1 = [
   {
-    menuId: 1,
+    MenuID: 1,
     title: "Menu",
     path: "/menu",
     url: "menu",
     icon: null,
-    parentId: 1,
+    ParentID: 1,
     index: true,
     element: "<DashboardLayout />",
   },
   {
-    menuId: 2,
+    MenuID: 2,
     title: "Dashboard",
     path: "/menu/dashboard",
     url: "dashboard",
     icon: "<DashboardOutlinedIcon />",
-    parentId: 2,
+    ParentID: 2,
     index: false,
     element: null,
   },
   {
-    menuId: 3,
+    MenuID: 3,
     title: "MBKM",
     path: "/menu/mbkm",
     url: "mbkm",
     icon: "<GroupsOutlinedIcon />",
-    parentId: 3,
+    ParentID: 3,
     index: false,
     element: null,
   },
   {
-    menuId: 4,
+    MenuID: 4,
     title: "Informasi",
     path: "/menu/mbkm/informasi",
     url: "mbkm/informasi",
     icon: "<InfoOutlinedIcon />",
     index: false,
-    parentId: 3,
+    ParentID: 3,
     element: null,
   },
   {
-    menuId: 5,
+    MenuID: 5,
     title: "Pengajuan",
     path: "/menu/mbkm/pengajuan",
     url: "mbkm/pengajuan",
     icon: "<DescriptionOutlinedIcon />",
     index: false,
-    parentId: 3,
+    ParentID: 3,
     element: "<Submission />",
   },
   {
-    menuId: 6,
+    MenuID: 6,
     title: "Daftar Pengajuan",
     path: "/menu/mbkm/daftar%20pengajuan",
     url: "mbkm/daftar pengajuan",
     icon: "<SegmentOutlinedIcon />",
     index: false,
-    parentId: 3,
+    ParentID: 3,
     element: "<ListSubmission />",
   },
 ];
 
-let menuAccess = [
+let menuAccess1 = [
   {
     menuAccessId: 1,
     accessId: 1,
-    menuId: 1,
+    MenuID: 1,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -89,7 +87,7 @@ let menuAccess = [
   {
     menuAccessId: 2,
     accessId: 1,
-    menuId: 3,
+    MenuID: 3,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -99,7 +97,7 @@ let menuAccess = [
   {
     menuAccessId: 3,
     accessId: 1,
-    menuId: 4,
+    MenuID: 4,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -109,7 +107,7 @@ let menuAccess = [
   {
     menuAccessId: 4,
     accessId: 1,
-    menuId: 5,
+    MenuID: 5,
     canRead: true,
     canAdd: true,
     canUpdate: true,
@@ -119,7 +117,7 @@ let menuAccess = [
   {
     menuAccessId: 5,
     accessId: 2,
-    menuId: 1,
+    MenuID: 1,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -129,7 +127,7 @@ let menuAccess = [
   {
     menuAccessId: 6,
     accessId: 2,
-    menuId: 2,
+    MenuID: 2,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -139,7 +137,7 @@ let menuAccess = [
   {
     menuAccessId: 7,
     accessId: 2,
-    menuId: 3,
+    MenuID: 3,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -149,7 +147,7 @@ let menuAccess = [
   {
     menuAccessId: 8,
     accessId: 2,
-    menuId: 6,
+    MenuID: 6,
     canRead: true,
     canAdd: false,
     canUpdate: false,
@@ -159,92 +157,27 @@ let menuAccess = [
 ];
 
 async function getMenu(accessId) {
-  accessId = parseInt(accessId)
-  // let menus = [
-  //   {
-  //     webMenuId: 1,
-  //     title: "Menu",
-  //     path: "/menu",
-  //     url: "menu",
-  //     icon: null,
-  //     parentId: 1,
-  //     index: true,
-  //     child: [],
-  //     element: "<DashboardLayout />",
-  //   },
-  //   {
-  //     webMenuId: 2,
-  //     title: "Dashboard",
-  //     path: "menu/dashboard",
-  //     url: "dashboard",
-  //     icon: "<DashboardOutlinedIcon />",
-  //     parentId: 1,
-  //     index: false,
-  //     child: [],
-  //     element: null,
-  //   },
-  //   {
-  //     webMenuId: 3,
-  //     title: "MBKM",
-  //     path: "menu/mbkm",
-  //     url: "mbkm",
-  //     icon: "<GroupsOutlinedIcon />",
-  //     parentId: 1,
-  //     index: false,
-  //     child: [
-  //       {
-  //         webMenuId: 4,
-  //         title: "Informasi",
-  //         path: "menu/mbkm/informasi",
-  //         url: "mbkm/informasi",
-  //         icon: "<InfoOutlinedIcon />",
-  //         index: false,
-  //         parentId: 3,
-  //         child: [],
-  //         element: null,
-  //       },
-  //       {
-  //         webMenuId: 5,
-  //         title: "Pengajuan",
-  //         path: "menu/mbkm/pengajuan",
-  //         url: "mbkm/pengajuan",
-  //         icon: "<DescriptionOutlinedIcon />",
-  //         index: false,
-  //         parentId: 3,
-  //         child: [],
-  //         element: null,
-  //       },
-  //       {
-  //         webMenuId: 6,
-  //         title: "Daftar Pengajuan",
-  //         path: "menu/mbkm/daftar pengajuan",
-  //         url: "mbkm/daftar pengajuan",
-  //         icon: "<SegmentOutlinedIcon />",
-  //         index: false,
-  //         parentId: 3,
-  //         child: [],
-  //         element: "<ListSubmission />",
-  //       },
-  //     ],
-  //     element: null,
-  //   },
-  // ];
+  accessId = parseInt(accessId);
+
+  let access = await menuRepo.getAccess();
+  let menus = await menuRepo.getMenu();
+  let menuAccess = await menuRepo.getMenuAccess();
 
   let parentMenu = menus.map((item) => {
     let menuAccessDetail = menuAccess.filter(
-      (menuAcc) => menuAcc.menuId === item.menuId && menuAcc.accessId === accessId
+      (menuAcc) => menuAcc.MenuID === item.MenuID && menuAcc.AccessId === accessId
     );
 
     return {
       ...item,
       menuAccess: menuAccessDetail.length > 0 ? menuAccessDetail[0] : null,
     };
-  }).filter((item) => item.menuAccess && item.parentId === item.menuId);
+  }).filter((item) => item.menuAccess && item.ParentID === item.MenuID);
 
   let detailMenu = parentMenu.map((item) => {
-    let childMenu = menus.filter((child) => child.parentId === item.menuId && child.parentId != child.menuId);
+    let childMenu = menus.filter((child) => child.ParentID === item.MenuID && child.ParentID != child.MenuID);
     let childMenuAccess = childMenu.map((childAcc) => {
-      let childMenuAccDetail = menuAccess.filter((x) => x.menuId === childAcc.menuId && x.accessId === accessId);
+      let childMenuAccDetail = menuAccess.filter((x) => x.MenuID === childAcc.MenuID && x.accessId === accessId);
 
       return {
         ...childAcc,
@@ -258,13 +191,13 @@ async function getMenu(accessId) {
     }
   })
 
-  return detailMenu;
+  return accessId;
 }
 
 async function getBreadcrumbPath() {
   var breadcrumbPath = {};
 
-  menus.forEach((item) => {
+  menus1.forEach((item) => {
     let key = item.path
     let value = item.title
 
