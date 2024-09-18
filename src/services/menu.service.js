@@ -165,7 +165,7 @@ async function getMenu(accessId) {
 
   let parentMenu = menus.map((item) => {
     let menuAccessDetail = menuAccess.filter(
-      (menuAcc) => menuAcc.MenuID === item.MenuID && menuAcc.AccessId === accessId
+      (menuAcc) => menuAcc.MenuID === item.MenuID && menuAcc.AccessID == accessId
     );
 
     return {
@@ -177,8 +177,7 @@ async function getMenu(accessId) {
   let detailMenu = parentMenu.map((item) => {
     let childMenu = menus.filter((child) => child.ParentID === item.MenuID && child.ParentID != child.MenuID);
     let childMenuAccess = childMenu.map((childAcc) => {
-      let childMenuAccDetail = menuAccess.filter((x) => x.MenuID === childAcc.MenuID && x.accessId === accessId);
-
+      let childMenuAccDetail = menuAccess.filter((x) => x.MenuID === childAcc.MenuID && x.AccessID === accessId);
       return {
         ...childAcc,
         menuAccess: childMenuAccDetail.length > 0 ? childMenuAccDetail[0] : null
@@ -191,7 +190,7 @@ async function getMenu(accessId) {
     }
   })
 
-  return accessId;
+  return detailMenu;
 }
 
 async function getBreadcrumbPath() {
