@@ -42,8 +42,8 @@ async function getBreadcrumbPath() {
   let menus = await menuRepo.getMenu();
 
   menus.forEach((item) => {
-    let key = item.path
-    let value = item.title
+    let key = item.Path
+    let value = item.Title
 
     breadcrumbPath[key] = value
   });
