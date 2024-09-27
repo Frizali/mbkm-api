@@ -1,6 +1,6 @@
 const menuRepo = require("../repository/menu.repository");
 
-async function getMenu(accessId) {
+async function getMenuByAccess(accessId) {
   accessId = parseInt(accessId);
   let access = await menuRepo.getAccessByID(accessId);
   if (!access) throw new Error('Sorry, you dont have access');
@@ -43,6 +43,6 @@ async function getBreadcrumbPath() {
 }
 
 module.exports = {
-  getMenu,
+  getMenuByAccess,
   getBreadcrumbPath
 };
