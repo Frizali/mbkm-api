@@ -58,9 +58,41 @@ async function getSubmissionAttBySubId(submissionId) {
   return data;
 }
 
+async function getSubmissionByAccessID(accessId) {
+  const submissions = await db.query(`SELECT * FROM tblSubmission s INNER JOIN 
+(
+SELECT 
+  sa.SubmissionID,
+  CONCAT(ApprovalStatus,' By ',AccDescription) AS ApprovalStatus
+FROM 
+  tblSubmissionApproval sa 
+  INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
+  INNER JOIN (
+    SELECT 
+      SubmissionID, 
+      MAX(Level) AS Level 
+    FROM 
+      tblSubmissionApproval sa 
+      INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
+      INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID 
+    GROUP BY 
+      SubmissionID
+  ) AS qryCurrApproval ON (
+    sa.SubmissionID = qryCurrApproval.SubmissionID 
+    AND a.Level = qryCurrApproval.Level
+  ) 
+  LEFT JOIN tblAccess acc ON a.AccessID = acc.AccessID
+) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
+INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID
+WHERE s.SubmissionID IN (SELECT sa.SubmissionID FROM tblApprover a INNER JOIN tblSubmissionApproval sa ON a.ApproverID = sa.ApproverID WHERE a.AccessID = ${accessId} AND sa.ApprovalStatus = 'Pending');`);
+  const data = helper.emptyOrRows(submissions);
+  return data;
+}
+
 module.exports = {
   getSubmissions,
   getSubmissionById,
   getSubmissionApprovalBySubId,
   getSubmissionAttBySubId,
+  getSubmissionByAccessID
 };
