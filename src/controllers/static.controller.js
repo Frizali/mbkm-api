@@ -1,9 +1,8 @@
-const menuService = require("../services/menu.service");
-const columnService = require("../services/column.service");
+const staticService = require("../services/static.service");
 
 async function getMenu(req, res, next) {
   try {
-    res.json(await menuService.getMenuByAccess(req.params.accessId));
+    res.json(await staticService.getMenuByAccess(req.params.accessId));
   } catch (err) {
     console.error(`Error while getting menus`, err.message);
     next(err);
@@ -12,7 +11,7 @@ async function getMenu(req, res, next) {
 
 async function getBreadcrumbPath(req, res, next) {
   try {
-    res.json(await menuService.getBreadcrumbPath());
+    res.json(await staticService.getBreadcrumbPath());
   } catch (err) {
     console.error(`Error while getting menus`, err.message);
     next(err);
@@ -21,7 +20,7 @@ async function getBreadcrumbPath(req, res, next) {
 
 async function getColumnSetup(req, res, next) {
   try {
-    res.json(await columnService.getColumnSetup(req.params.type, req.params.accessId));
+    res.json(await staticService.getColumnSetup(req.params.type, req.params.accessId));
   } catch (err) {
     console.error(`Error while getting menus`, err.message);
     next(err);
@@ -30,7 +29,7 @@ async function getColumnSetup(req, res, next) {
 
 async function updateColumnWidth(req, res, next) {
   try {
-    res.json(await columnService.updateWidthColumn(req.body));
+    res.json(await staticService.updateWidthColumn(req.body));
   } catch (err) {
     console.error(`Error while updatting column`, err.message);
     next(err);

@@ -7,8 +7,8 @@ async function getColumnSetup(type, accessId) {
     return data;
 }
 
-async function updateWidthColumn(id, width) {
-    const result = db.query(`UPDATE tblColumnSetup SET width=${width} WHERE ID=${id};`);
+async function updateWidthColumn(id, width, visibility) {
+    const result = db.query(`UPDATE tblColumnSetup SET width=${width}, visibility=${visibility} WHERE ID=${id};`);
     
     let message = 'Column Width updated successfully';
   

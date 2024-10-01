@@ -1,5 +1,14 @@
 const submissionService = require("../services/submission.service");
 
+async function submit(req, res, next) {
+  try {
+    res.json(await submissionService.submit(req.body));
+  } catch (err) {
+    console.error(`Error while submit submission`, err.message);
+    next(err);
+  }
+}
+
 async function getSubmissions(req, res, next) {
   try {
     res.json(await submissionService.getSubmissions());
@@ -28,6 +37,7 @@ async function getSubmissionByAccessID(req, res, next) {
 }
 
 module.exports = {
+    submit,
     getSubmissions,
     getSubmissionDetail,
     getSubmissionByAccessID

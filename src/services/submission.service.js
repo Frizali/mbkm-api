@@ -1,5 +1,14 @@
 const submissionRepo = require("../repository/submission.repository");
 
+async function submit(submission) {
+    const firstApprover = await submissionRepo.getFirstApproverByProdiId(submission.ProdiID);
+    if(!firstApprover) throw new Error('No Approver on this prodi, please set level approver');
+
+    const uuid = uuidv4();
+    await submissionRepo.create(uuid,submission);
+    return await submissionRepo.createSubmissionApproval(uuid,firstApprover.ApproverID,'Pending');
+}
+
 async function getSubmissions() {
     let submissions = await submissionRepo.getSubmissions();
     submissions.forEach(submission => {
@@ -46,7 +55,17 @@ async function getSubmissionByAccessID(accessId) {
     return submissions;
 }
 
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    .replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0, 
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 module.exports = {
+    submit,
     getSubmissions,
     getSubmissionDetail,
     getSubmissionByAccessID

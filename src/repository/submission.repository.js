@@ -1,6 +1,50 @@
 const db = require("./db.service");
 const helper = require("../utils/helper.util");
 
+async function create(submissionId,s) {
+  const result = await db.query(
+    `INSERT INTO tblSubmission
+    (SubmissionID,StudentID,ProdiID,SubmissionDate,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [
+      submissionId,
+      s.StudentID,
+      s.ProdiID,
+      new Date().toISOString().slice(0, 10),
+      s.ProgramType,
+      s.Reason,
+      s.Title,
+      s.InstitutionName,
+      s.StartDate,
+      s.EndDate,
+      s.Position,
+      s.ActivityDetails,
+    ]
+  );
+
+  let message = "Error in submit Submission";
+
+  if (result.affectedRows) {
+    message = "Submission created successfully";
+  }
+
+  return { message };
+}
+
+async function createSubmissionApproval(submissionId, approverId, status) {
+  const result = await db.query(
+    `INSERT INTO tblSubmissionApproval (SubmissionID,ApproverID,ApprovalStatus) VALUES (?,?,?)`, [submissionId, approverId, status]
+  );
+
+  let message = "Error in submit Submission";
+
+  if (result.affectedRows) {
+    message = "Submission created successfully";
+  }
+
+  return { message };
+}
+
 async function getSubmissions() {
   const submissions = await db.query(`
 SELECT * FROM tblSubmission s INNER JOIN 
@@ -89,10 +133,21 @@ WHERE s.SubmissionID IN (SELECT sa.SubmissionID FROM tblApprover a INNER JOIN tb
   return data;
 }
 
+async function getFirstApproverByProdiId(prodiId) {
+  const approver = await db.query(
+    `SELECT * FROM tblApprover WHERE ProdiID=${prodiId} ORDER BY Level LIMIT 1;`
+  );
+  const data = helper.emptyOrRows(approver);
+  return data[0];
+}
+
 module.exports = {
+  create,
   getSubmissions,
   getSubmissionById,
   getSubmissionApprovalBySubId,
   getSubmissionAttBySubId,
-  getSubmissionByAccessID
+  getSubmissionByAccessID,
+  getFirstApproverByProdiId,
+  createSubmissionApproval
 };
