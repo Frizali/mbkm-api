@@ -141,6 +141,10 @@ async function getFirstApproverByProdiId(prodiId) {
   return data[0];
 }
 
+async function getCurrentApprover(submissionId, accessId) {
+  const currApprover = await db.query(``)
+}
+
 module.exports = {
   create,
   getSubmissions,

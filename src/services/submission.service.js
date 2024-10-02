@@ -9,6 +9,10 @@ async function submit(submission) {
     return await submissionRepo.createSubmissionApproval(uuid,firstApprover.ApproverID,'Pending');
 }
 
+async function approve(submissionId, accessId) {
+    
+}
+
 async function getSubmissions() {
     let submissions = await submissionRepo.getSubmissions();
     submissions.forEach(submission => {
