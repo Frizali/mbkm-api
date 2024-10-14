@@ -56,7 +56,14 @@ async function getSubmissionByAccessID(accessId) {
         submission.StartDate = dateFormatted(submission.StartDate);
         submission.EndDate = dateFormatted(submission.EndDate);
     });
-    return submissions;
+
+    return await Promise.all(submissions.map(async (item) => {
+        let submissionApproval = await submissionRepo.getSubmissionApprovalBySubmission(item.SubmissionID);
+        return {
+            ...item,
+            ApprovalStatus: submissionApproval
+        };
+    }));
 }
 
 function uuidv4() {
