@@ -47,10 +47,11 @@ async function getSubmissionDetail(submissionId) {
     }
 }
 
-async function getSubmissionByAccessID(accessId) {
+async function getSubmissionByAccessID(accessId, req) {
+    const user = req.user;
     accessId = parseInt(accessId);
 
-    const submissions = await submissionRepo.getSubmissionByAccessID(accessId);
+    const submissions = await submissionRepo.getSubmissionByAccessID(accessId, user.id);
     submissions.forEach(submission => {
         submission.SubmissionDate = dateFormatted(submission.SubmissionDate);
         submission.StartDate = dateFormatted(submission.StartDate);

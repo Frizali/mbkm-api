@@ -29,7 +29,7 @@ async function getSubmissionDetail(req, res, next) {
 
 async function getSubmissionByAccessID(req, res, next) {
   try {
-    res.json(await submissionService.getSubmissionByAccessID(req.params.accessId));
+    res.json(await submissionService.getSubmissionByAccessID(req.params.accessId, req));
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);
     next(err);

@@ -1,7 +1,7 @@
 const db = require("./db.service");
 const helper = require("../utils/helper.util");
 
-async function create(submissionId,s) {
+async function create(submissionId, s) {
   const result = await db.query(
     `INSERT INTO tblSubmission
     (SubmissionID,StudentID,ProdiID,SubmissionDate,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails)
@@ -33,7 +33,8 @@ async function create(submissionId,s) {
 
 async function createSubmissionApproval(submissionId, approverId, status) {
   const result = await db.query(
-    `INSERT INTO tblSubmissionApproval (SubmissionID,ApproverID,ApprovalStatus) VALUES (?,?,?)`, [submissionId, approverId, status]
+    `INSERT INTO tblSubmissionApproval (SubmissionID,ApproverID,ApprovalStatus) VALUES (?,?,?)`,
+    [submissionId, approverId, status]
   );
 
   let message = "Error in submit Submission";
@@ -118,11 +119,27 @@ async function getSubmissionAttBySubId(submissionId) {
   return data;
 }
 
-async function getSubmissionByAccessID(accessId) {
+async function getSubmissionByAccessID(accessId, userId) {
+  let filter = `s.SubmissionID IN (
+    SELECT 
+      sa.SubmissionID 
+    FROM 
+      tblApprover a 
+      INNER JOIN tblSubmissionApproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}
+      AND sa.ApprovalStatus = 'Pending'
+  );`;
+
+  if (accessId == 1) {
+    filter = `  s.StudentID = '${userId}'`;
+  }
+
   const submissions = await db.query(
-`SELECT 
+    `SELECT 
   u.Name, 
   p.ProdiName,
+  qryApproval.ApprovalStatus AS CurrentApproval,
   s.* 
 FROM 
   tblSubmission s 
@@ -153,18 +170,10 @@ FROM
   ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
   INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID 
   INNER JOIN tblUser u ON u.UserID = s.StudentID 
-WHERE 
-  s.SubmissionID IN (
-    SELECT 
-      sa.SubmissionID 
-    FROM 
-      tblApprover a 
-      INNER JOIN tblSubmissionApproval sa ON a.ApproverID = sa.ApproverID 
-    WHERE 
-      a.AccessID = ${accessId}
-      AND sa.ApprovalStatus = 'Pending'
+WHERE ${filter}
+`
   );
-`);
+
   const data = helper.emptyOrRows(submissions);
   return data;
 }
@@ -186,7 +195,7 @@ async function getSubmissionApprovalBySubmission(submissionId) {
 }
 
 async function getCurrentApprover(submissionId, accessId) {
-  const currApprover = await db.query(``)
+  const currApprover = await db.query(``);
 }
 
 module.exports = {
@@ -198,5 +207,5 @@ module.exports = {
   getSubmissionByAccessID,
   getFirstApproverByProdiId,
   createSubmissionApproval,
-  getSubmissionApprovalBySubmission
+  getSubmissionApprovalBySubmission,
 };
