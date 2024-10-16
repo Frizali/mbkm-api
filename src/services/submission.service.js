@@ -1,4 +1,5 @@
 const submissionRepo = require("../repository/submission.repository");
+const userRepo = require("../repository/user.repository");
 
 async function submit(submission) {
     const firstApprover = await submissionRepo.getFirstApproverByProdiId(submission.ProdiID);
@@ -30,20 +31,20 @@ function dateFormatted(dateId){
 }
 
 async function getSubmissionDetail(submissionId) {
-    submissionId = parseInt(submissionId);
+    // if(!submission) throw new Error(`Submission with id ${submissionId} not found`);
 
-    let submission = await submissionRepo.getSubmissionById(submissionId);
-    if(!submission) throw new Error(`Submission with id ${submissionId} not found`);
-
-    let [subApproval, subAttachment] = await Promise.all([
-        submissionRepo.getSubmissionApprovalBySubId(submissionId),
+    let [submission,subApproval, subAttachment] = await Promise.all([
+        submissionRepo.getSubmissionById(submissionId),
+        submissionRepo.getSubmissionApprovalBySubmission(submissionId),
         submissionRepo.getSubmissionAttBySubId(submissionId)
     ]);
 
+    let studentDetail = await userRepo.getUserByID(submission.StudentID);
     return {
         submission: submission,
         submissionApproval: subApproval,
         submissionAttachment: subAttachment,
+        student: studentDetail
     }
 }
 
@@ -67,6 +68,15 @@ async function getSubmissionByAccessID(accessId, req) {
     }));
 }
 
+async function deleteSubmission(submissionId, req) {
+    const user = req.user;
+    var accessId = parseInt(user.accessId);
+
+    if(accessId != 1) throw new Error('You dont have access to delete')
+    
+    return await submissionRepo.deleteSubmission(submissionId);
+}
+
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     .replace(/[xy]/g, function (c) {
@@ -80,5 +90,6 @@ module.exports = {
     submit,
     getSubmissions,
     getSubmissionDetail,
-    getSubmissionByAccessID
+    getSubmissionByAccessID,
+    deleteSubmission
 }

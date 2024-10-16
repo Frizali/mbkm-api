@@ -24,7 +24,27 @@ async function createUser(user, password) {
   return { message };
 }
 
+async function getUserByID(userId) {
+  const result = await db.query(`SELECT 
+  u.UserID AS NIM, 
+  u.Name, 
+  u.Email, 
+  u.ProdiID, 
+  p.ProdiName, 
+  u.LecturerGuardianID, 
+  lg.Name AS LecturerGuardianName
+FROM 
+  tblUser u 
+  INNER JOIN tblProdi p ON u.ProdiID = p.ProdiID 
+  LEFT JOIN tblUser lg ON u.LecturerGuardianID = lg.UserID
+  WHERE u.UserID = ${userId};`);
+
+  const data = helper.emptyOrRows(result);
+  return data[0];
+}
+
 module.exports = {
   getUserByEmail,
   createUser,
+  getUserByID
 };

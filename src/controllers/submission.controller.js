@@ -36,9 +36,19 @@ async function getSubmissionByAccessID(req, res, next) {
   }
 }
 
+async function deleteSubmission(req, res, next) {
+  try {
+    res.json(await submissionService.deleteSubmission(req.params.submissionId, req));
+  } catch (err) {
+    console.error(`Error while delete submission`, err.message);
+    next(err);
+  }
+}
+
 module.exports = {
     submit,
     getSubmissions,
     getSubmissionDetail,
-    getSubmissionByAccessID
+    getSubmissionByAccessID,
+    deleteSubmission
 }

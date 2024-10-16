@@ -95,25 +95,15 @@ WHERE
 
 async function getSubmissionById(submissionId) {
   const submission = await db.query(
-    `SELECT * FROM tblSubmission WHERE SubmissionID=${submissionId}`
+    `SELECT * FROM tblSubmission WHERE SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submission);
   return data[0];
 }
 
-async function getSubmissionApprovalBySubId(submissionId) {
-  const submissionApproval =
-    await db.query(`SELECT AccDescription,ApprovalStatus,ApprovalDate,Level FROM tblSubmissionApproval sa 
-        INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
-        INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID
-        WHERE SubmissionID=${submissionId} ORDER BY Level`);
-  const data = helper.emptyOrRows(submissionApproval);
-  return data;
-}
-
 async function getSubmissionAttBySubId(submissionId) {
   const submissionAttachment = await db.query(
-    `SELECT * FROM tblSubmissionAttachment WHERE SubmissionID=${submissionId}`
+    `SELECT * FROM tblSubmissionAttachment WHERE SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submissionAttachment);
   return data;
@@ -198,14 +188,22 @@ async function getCurrentApprover(submissionId, accessId) {
   const currApprover = await db.query(``);
 }
 
+async function deleteSubmission(submissionId) {
+  await db.query(`DELETE FROM tblSubmission WHERE SubmissionID = '${submissionId}'`)
+
+  let message = "Submission has been deleted";
+
+  return { message };
+}
+
 module.exports = {
   create,
   getSubmissions,
   getSubmissionById,
-  getSubmissionApprovalBySubId,
   getSubmissionAttBySubId,
   getSubmissionByAccessID,
   getFirstApproverByProdiId,
   createSubmissionApproval,
   getSubmissionApprovalBySubmission,
+  deleteSubmission
 };
