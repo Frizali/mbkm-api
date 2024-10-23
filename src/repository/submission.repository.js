@@ -31,6 +31,18 @@ async function create(submissionId, s) {
   return { message };
 }
 
+async function updateSubmissionApproval(submissionId, approverId, status) {
+  const result = await db.query(`UPDATE tblSubmissionApproval SET ApprovalStatus='${status}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`)
+ 
+  let message = "Error in update Submission Approval";
+
+  if (result.affectedRows) {
+    message = "Submission Approval updated successfully";
+  }
+
+  return { message };
+}
+
 async function createSubmissionApproval(submissionId, approverId, status) {
   const result = await db.query(
     `INSERT INTO tblSubmissionApproval (SubmissionID,ApproverID,ApprovalStatus) VALUES (?,?,?)`,
@@ -185,15 +197,43 @@ async function getSubmissionApprovalBySubmission(submissionId) {
 }
 
 async function getCurrentApprover(submissionId, accessId) {
-  const currApprover = await db.query(``);
+  const currApprover = await db.query(`SELECT 
+  * 
+FROM 
+  tblSubmissionApproval sa 
+  INNER JOIN (
+    SELECT 
+      a.* 
+    FROM 
+      tblApprover a 
+      INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID 
+    WHERE 
+      a.AccessID = ${accessId}
+  ) AS qryApprover ON sa.ApproverID = qryApprover.ApproverID 
+WHERE 
+  SubmissionID = '${submissionId}' 
+  AND ApprovalStatus = 'Pending';
+`);
+
+  const data = helper.emptyOrRows(currApprover);
+  return data[0];
 }
 
 async function deleteSubmission(submissionId) {
-  await db.query(`DELETE FROM tblSubmission WHERE SubmissionID = '${submissionId}'`)
+  await db.query(
+    `DELETE FROM tblSubmission WHERE SubmissionID = '${submissionId}'`
+  );
 
   let message = "Submission has been deleted";
 
   return { message };
+}
+
+async function getNextApprover(prodiId, level) {
+  const approver = await db.query(`SELECT * FROM tblApprover WHERE ProdiID = ${prodiId} AND Level = ${level}`)
+
+  const data = helper.emptyOrRows(approver);
+  return data[0];
 }
 
 module.exports = {
@@ -205,5 +245,8 @@ module.exports = {
   getFirstApproverByProdiId,
   createSubmissionApproval,
   getSubmissionApprovalBySubmission,
-  deleteSubmission
+  getCurrentApprover,
+  getNextApprover,
+  updateSubmissionApproval,
+  deleteSubmission,
 };

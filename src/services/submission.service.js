@@ -11,7 +11,21 @@ async function submit(submission) {
 }
 
 async function approve(submissionId, accessId) {
+    let currApprover = await submissionRepo.getCurrentApprover(submissionId, accessId);
+    if(!currApprover) throw new Error('You dont have access to approve this submission');
+
+    await  Promise.all([
+        submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, 'Approved')
+    ])
     
+    let nextApprover = await submissionRepo.getNextApprover(currApprover.ProdiID, currApprover.Level + 1);
+
+    if(nextApprover){
+        await submissionRepo.createSubmissionApproval(submissionId, nextApprover.ApproverID, 'Pending');
+    }
+
+    let message = "Submission has been approved"
+    return { message }
 }
 
 async function getSubmissions() {
@@ -91,5 +105,6 @@ module.exports = {
     getSubmissions,
     getSubmissionDetail,
     getSubmissionByAccessID,
-    deleteSubmission
+    deleteSubmission,
+    approve
 }

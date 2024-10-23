@@ -9,6 +9,17 @@ async function submit(req, res, next) {
   }
 }
 
+async function approve(req, res, next) {
+  try {
+    res.json(
+      await submissionService.approve(req.params.submissionId, req.params.accessId)
+    );
+  } catch (err) {
+    console.error(`Error while getting submission detail`, err.message);
+    next(err);
+  }
+}
+
 async function getSubmissions(req, res, next) {
   try {
     res.json(await submissionService.getSubmissions());
@@ -20,7 +31,9 @@ async function getSubmissions(req, res, next) {
 
 async function getSubmissionDetail(req, res, next) {
   try {
-    res.json(await submissionService.getSubmissionDetail(req.params.submissionId));
+    res.json(
+      await submissionService.getSubmissionDetail(req.params.submissionId)
+    );
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);
     next(err);
@@ -29,7 +42,9 @@ async function getSubmissionDetail(req, res, next) {
 
 async function getSubmissionByAccessID(req, res, next) {
   try {
-    res.json(await submissionService.getSubmissionByAccessID(req.params.accessId, req));
+    res.json(
+      await submissionService.getSubmissionByAccessID(req.params.accessId, req)
+    );
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);
     next(err);
@@ -38,7 +53,9 @@ async function getSubmissionByAccessID(req, res, next) {
 
 async function deleteSubmission(req, res, next) {
   try {
-    res.json(await submissionService.deleteSubmission(req.params.submissionId, req));
+    res.json(
+      await submissionService.deleteSubmission(req.params.submissionId, req)
+    );
   } catch (err) {
     console.error(`Error while delete submission`, err.message);
     next(err);
@@ -46,9 +63,10 @@ async function deleteSubmission(req, res, next) {
 }
 
 module.exports = {
-    submit,
-    getSubmissions,
-    getSubmissionDetail,
-    getSubmissionByAccessID,
-    deleteSubmission
-}
+  submit,
+  approve,
+  getSubmissions,
+  getSubmissionDetail,
+  getSubmissionByAccessID,
+  deleteSubmission,
+};
