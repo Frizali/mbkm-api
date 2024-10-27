@@ -5,6 +5,7 @@ const db = {
     user: 'root',
     database: 'mbkm',
     port: env.DB_PORT || 3306,
+    password: 'password',
     // ssl: {
     //   mode: 'VERIFY_IDENTITY',
     //   ca: fs.readFileSync('/etc/ssl/cert.pem', 'utf-8'),
