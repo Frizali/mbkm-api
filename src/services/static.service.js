@@ -1,5 +1,7 @@
 const menuRepo = require("../repository/menu.repository");
 const columnRepo = require('../repository/column.repository');
+const accessRepo = require('../repository/access.repository');
+const userRepo = require('../repository/user.repository');
 
 // Column Setup
 async function getColumnSetup(type,accessId) {
@@ -63,9 +65,24 @@ async function getBreadcrumbPath() {
   return breadcrumbPath;
 }
 
+// Access
+
+async function getRoleDetail() {
+  let [roles,userAvatar] = await Promise.all([
+    accessRepo.getRoles(),
+    userRepo.getAvatar()
+  ])
+
+  return roles.map(role => ({
+    ...role,
+    users: userAvatar.filter(user => user.AccessID === role.AccessID).map(x => x.Avatar.toString('base64'))
+  }))
+}
+
 module.exports = {
   getColumnSetup,
   updateWidthColumn,
   getMenuByAccess,
-  getBreadcrumbPath
+  getBreadcrumbPath,
+  getRoleDetail
 };

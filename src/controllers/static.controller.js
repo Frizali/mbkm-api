@@ -36,9 +36,19 @@ async function updateColumnWidth(req, res, next) {
   }
 }
 
+async function getRoleDetail(req, res, next) {
+  try {
+    res.json(await staticService.getRoleDetail());
+  } catch (err) {
+    console.error(`Error while get role detail`, err.message);
+    next(err);
+  }
+}
+
 module.exports = {
     getMenu,
     getBreadcrumbPath,
     getColumnSetup,
-    updateColumnWidth
+    updateColumnWidth,
+    getRoleDetail
 }

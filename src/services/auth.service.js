@@ -4,23 +4,23 @@ const jwt = require("jsonwebtoken");
 const userRepo = require("../repository/user.repository");
 
 async function register(params) {
-  let userIsExist = await userRepo.getUserByEmail(params.Email);
+  if (!params.email || !params.password) {
+    throw new Error("Email and password are required.");
+  }
+
+  let userIsExist = await userRepo.getUserByEmail(params.email);
 
   if (userIsExist) {
     throw new Error("This user is already in use!");
   } else {
-    bcrypt.hash(params.password, 10, async (err, hash) => {
-      if (err) {
-        throw new Error(err);
-      } else {
-        await userRepo.createUser(params, hash);
-      }
-    });
+    const hash = await bcrypt.hash(params.password, 10);
+
+    await userRepo.createUser(params, hash);
   }
 }
 
 async function login(params) {
-  let user = await userRepo.getUserByEmail(params.email);
+  let user = await userRepo.getUserByEmailOrName(params.user);
   let token = "";
 
   if (!user) {

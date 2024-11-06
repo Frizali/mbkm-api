@@ -1,9 +1,9 @@
 const db = require("./db.service");
 const helper = require("../utils/helper.util");
 
-async function getUserByEmail(email) {
+async function getUserByEmailOrName(user) {
   const rows = await db.query(
-    `SELECT * FROM tblUser WHERE LOWER(Email) = LOWER('${email}')`
+    `SELECT * FROM tblUser WHERE LOWER(Email) = LOWER('${user}') OR LOWER(Name) = LOWER('${user}')`
   );
   const data = helper.emptyOrRows(rows);
   return data[0];
@@ -43,8 +43,15 @@ FROM
   return data[0];
 }
 
+async function getAvatar() {
+  const rows = await db.query('SELECT UserPhoto AS Avatar, AccessID FROM tblUser');
+  const data = helper.emptyOrRows(rows);
+  return data;
+}
+
 module.exports = {
-  getUserByEmail,
+  getUserByEmailOrName,
   createUser,
-  getUserByID
+  getUserByID,
+  getAvatar
 };
