@@ -65,6 +65,10 @@ async function getBreadcrumbPath() {
   return breadcrumbPath;
 }
 
+async function getMenuAccessDetailByAccessID(accessId) {
+  return await menuRepo.getMenuAccessDetailByAccessID(accessId);
+}
+
 // Access
 
 async function getRoleDetail() {
@@ -84,5 +88,6 @@ module.exports = {
   updateWidthColumn,
   getMenuByAccess,
   getBreadcrumbPath,
-  getRoleDetail
+  getRoleDetail,
+  getMenuAccessDetailByAccessID
 };

@@ -4,6 +4,7 @@ const staticController = require('../controllers/static.controller');
 
 // Menu
 router.get('/menu/:accessId', staticController.getMenu);
+router.get('/menu/menu-access-detail/:accessId', staticController.getMenuAccessDetailByAccessID);
 // Breadcrumb
 router.get('/breadcrumb', staticController.getBreadcrumbPath);
 // Column Setup

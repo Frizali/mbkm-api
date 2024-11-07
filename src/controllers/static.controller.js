@@ -9,6 +9,15 @@ async function getMenu(req, res, next) {
   }
 }
 
+async function getMenuAccessDetailByAccessID(req, res, next) {
+  try {
+    res.json(await staticService.getMenuAccessDetailByAccessID(req.params.accessId));
+  } catch (error) {
+    console.error(`Error while getting menu access detail`, err.message);
+    next(err);
+  }
+}
+
 async function getBreadcrumbPath(req, res, next) {
   try {
     res.json(await staticService.getBreadcrumbPath());
@@ -50,5 +59,6 @@ module.exports = {
     getBreadcrumbPath,
     getColumnSetup,
     updateColumnWidth,
-    getRoleDetail
+    getRoleDetail,
+    getMenuAccessDetailByAccessID
 }
