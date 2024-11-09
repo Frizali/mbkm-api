@@ -13,6 +13,24 @@ async function getMenu() {
   return data;
 }
 
+async function getMenuAccessDetailByAccessID(accessId) {
+  const rows = await db.query(`SELECT m.Title,ma.* FROM tblMenuAccess ma INNER JOIN tblMenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID=?;`,[accessId])
+  const data = helper.emptyOrRows(rows);
+  return data.map((item) => {
+    return {
+      Title: item.Title,
+      MenuAccessID: item.MenuAccessID,
+      MenuID: item.MenuID,
+      AccessID: item.AccessID,
+      CanRead: item.CanRead == 0 ? false : true,
+      CanAdd: item.CanAdd == 0 ? false : true,
+      CanEdit: item.CanEdit == 0 ? false : true,
+      CanDelete: item.CanDelete == 0 ? false : true,
+      CanPrint: item.CanPrint == 0 ? false : true,
+    }
+  });
+}
+
 async function getMenuAccess() {
   const rows = await db.query(`SELECT * FROM tblMenuAccess`);
   const data = helper.emptyOrRows(rows);
@@ -33,5 +51,6 @@ async function getMenuAccess() {
 module.exports = {
     getAccessByID,
     getMenu,
-    getMenuAccess
+    getMenuAccess,
+    getMenuAccessDetailByAccessID
 }
