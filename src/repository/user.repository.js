@@ -11,7 +11,7 @@ async function getUserByEmail(email) {
 
 async function createUser(user, password) {
   const result = await db.query(
-    `INSERT INTO tblUser (UserID, Name, Email, Password) VALUES(?,?,?,?)`,
+    `INSERT INTO tblUser (UserID, Name, ProdiID, LecturerGuardianID, Email, Password) VALUES(?,?,1,NULL,?,?)`,
     [user.userId, user.name, user.email, password]
   );
 
