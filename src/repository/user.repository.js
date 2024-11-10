@@ -11,8 +11,8 @@ async function getUserByEmailOrName(user) {
 
 async function createUser(user, password) {
   const result = await db.query(
-    `INSERT INTO tblUser (UserID, Name, ProdiID, LecturerGuardianID, Email, Password) VALUES(?,?,1,NULL,?,?)`,
-    [user.userId, user.name, user.email, password]
+    `INSERT INTO tblUser (UserID, Name, ProdiID, LecturerGuardianID, Email, Password, AccessID) VALUES(?,?,?,?,?,?,?)`,
+    [user.userId, user.name, user.prodiID, '1', user.email, password, '1']
   );
 
   let message = "Error in submit Submission";
