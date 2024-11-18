@@ -8,7 +8,7 @@ async function register(params) {
     throw new Error("Email and password are required.");
   }
 
-  let userIsExist = await userRepo.getUserByEmail(params.email);
+  let userIsExist = await userRepo.getUserByEmailOrName(params.email);
 
   if (userIsExist) {
     throw new Error("This user is already in use!");
