@@ -2,7 +2,6 @@ const authService = require("../services/auth.service");
 
 async function register(req, res, next) {
   try {
-    console.log("register controller");
     const response = await authService.register(req.body);
     res.json(response);
   } catch (err) {

@@ -8,14 +8,12 @@ async function register(params) {
     throw new Error("Email and password are required.");
   }
 
-  console.log(params);
   let userIsExist = await userRepo.getUserByEmailOrName(params.user);
 
   if (userIsExist) {
     throw new Error("This user is already in use!");
   } else {
     const hash = await bcrypt.hash(params.password, 10);
-    console.log(hash);
     await userRepo.createUser(params, hash);
   }
 }
