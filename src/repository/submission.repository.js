@@ -4,8 +4,8 @@ const helper = require("../utils/helper.util");
 async function create(submissionId, s) {
   const result = await db.query(
     `INSERT INTO tblSubmission
-    (SubmissionID,StudentID,ProdiID,SubmissionDate,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+    (SubmissionID,StudentID,ProdiID,SubmissionDate,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails,SupervisorID)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
       submissionId,
       s.StudentID,
@@ -19,6 +19,7 @@ async function create(submissionId, s) {
       s.EndDate,
       s.Position,
       s.ActivityDetails,
+      s.SupervisorID
     ]
   );
 

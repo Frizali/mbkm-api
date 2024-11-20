@@ -45,15 +45,19 @@ function dateFormatted(dateId){
 }
 
 async function getSubmissionDetail(submissionId) {
-    // if(!submission) throw new Error(`Submission with id ${submissionId} not found`);
-
     let [submission,subApproval, subAttachment] = await Promise.all([
         submissionRepo.getSubmissionById(submissionId),
         submissionRepo.getSubmissionApprovalBySubmission(submissionId),
         submissionRepo.getSubmissionAttBySubId(submissionId)
     ]);
 
+    subAttachment = subAttachment.map(item => ({
+        ...item,
+        Base64: item.Base64.toString('base64')
+    }));
+
     let studentDetail = await userRepo.getUserByID(submission.StudentID);
+    studentDetail.UserPhoto = studentDetail.UserPhoto.toString('base64')
     return {
         submission: submission,
         submissionApproval: subApproval,

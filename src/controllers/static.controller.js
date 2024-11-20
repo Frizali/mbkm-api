@@ -54,11 +54,21 @@ async function getRoleDetail(req, res, next) {
   }
 }
 
+async function getUserByAccessID(req, res, next) {
+  try {
+    res.json(await staticService.getUserByAccessID(req.params.accessId));
+  } catch (err) {
+    console.error(`Error while getting user`, err.message);
+    next(err);
+  }
+}
+
 module.exports = {
     getMenu,
     getBreadcrumbPath,
     getColumnSetup,
     updateColumnWidth,
     getRoleDetail,
-    getMenuAccessDetailByAccessID
+    getMenuAccessDetailByAccessID,
+    getUserByAccessID
 }
