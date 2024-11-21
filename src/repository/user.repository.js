@@ -3,7 +3,7 @@ const helper = require("../utils/helper.util");
 
 async function getUserByEmailOrName(user) {
   const rows = await db.query(
-    `SELECT * FROM tblUser WHERE LOWER(Email) = LOWER('${user}') OR LOWER(Name) = LOWER('${user}')`
+    `SELECT * FROM tblUser INNER JOIN tblProdi ON tblUser.ProdiID = tblProdi.ProdiID WHERE LOWER(Email) = LOWER('${user}') OR LOWER(Name) = LOWER('${user}')`
   );
   const data = helper.emptyOrRows(rows);
   return data[0];
@@ -11,8 +11,8 @@ async function getUserByEmailOrName(user) {
 
 async function createUser(user, password) {
   const result = await db.query(
-    `INSERT INTO tblUser (UserID, Name, ProdiID, LecturerGuardianID, Email, Password, AccessID) VALUES(?,?,?,?,?,?,?)`,
-    [user.userId, user.name, user.prodiId, '3312311043', user.email, password, '1']
+    `INSERT INTO tblUser (UserID, Name, ProdiID, Email, Password, AccessID) VALUES(?,?,?,?,?,?)`,
+    [user.userId, user.name, user.prodiId, user.email, password, '6']
   );
 
   let message = "Error in submit Submission";
@@ -44,6 +44,12 @@ FROM
   return data[0];
 }
 
+async function getUserByAccessID(accessId) {
+  const result = await db.query(`SELECT UserID,Name,ProdiID,UserPhoto,Email FROM tblUser WHERE AccessID = ${accessId}`)
+
+  return helper.emptyOrRows(result)
+}
+
 async function getAvatar() {
   const rows = await db.query('SELECT UserPhoto AS Avatar, AccessID FROM tblUser');
   const data = helper.emptyOrRows(rows);
@@ -54,5 +60,6 @@ module.exports = {
   getUserByEmailOrName,
   createUser,
   getUserByID,
-  getAvatar
+  getAvatar,
+  getUserByAccessID
 };

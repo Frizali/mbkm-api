@@ -70,7 +70,6 @@ async function getMenuAccessDetailByAccessID(accessId) {
 }
 
 // Access
-
 async function getRoleDetail() {
   let [roles,userAvatar] = await Promise.all([
     accessRepo.getRoles(),
@@ -83,11 +82,16 @@ async function getRoleDetail() {
   }))
 }
 
+async function getUserByAccessID(accessID) {
+  return await userRepo.getUserByAccessID(accessID)
+}
+
 module.exports = {
   getColumnSetup,
   updateWidthColumn,
   getMenuByAccess,
   getBreadcrumbPath,
   getRoleDetail,
-  getMenuAccessDetailByAccessID
+  getMenuAccessDetailByAccessID,
+  getUserByAccessID
 };

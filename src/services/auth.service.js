@@ -29,7 +29,7 @@ async function login(params) {
   const bResult = await bcrypt.compare(params.password, user.Password);
 
   if (bResult) {
-    token = jwt.sign({ id: user.UserID, name: user.Name, prodiId: user.ProdiID, accessId: user.AccessID }, "mbkm292021173004050301@if@3312311045@*%", {
+    token = jwt.sign({ id: user.UserID, name: user.Name, prodiId: user.ProdiID, prodiName: user.ProdiName, accessId: user.AccessID }, "mbkm292021173004050301@if@3312311045@*%", {
       expiresIn: "1h",
     });
   } else {

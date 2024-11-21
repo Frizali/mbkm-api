@@ -7,6 +7,9 @@ async function submit(submission) {
 
     const uuid = uuidv4();
     await submissionRepo.create(uuid,submission);
+    if(submission.ProgramType == "Pertukaran Pelajar"){
+        
+    }
     return await submissionRepo.createSubmissionApproval(uuid,firstApprover.ApproverID,'Pending');
 }
 
@@ -50,6 +53,11 @@ async function getSubmissionDetail(submissionId) {
         submissionRepo.getSubmissionApprovalBySubmission(submissionId),
         submissionRepo.getSubmissionAttBySubId(submissionId)
     ]);
+
+    subAttachment = subAttachment.map(item => ({
+        ...item,
+        Base64: item.Base64.toString('base64')
+    }));
 
     let studentDetail = await userRepo.getUserByID(submission.StudentID);
     studentDetail.UserPhoto = studentDetail.UserPhoto.toString('base64')
