@@ -1,0 +1,34 @@
+openapi: '3.0.3'
+info:
+  title: MBKM API
+  version: '1.0'
+servers:
+  - url: http://localhost:3001/api
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: This endpoint registers a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                name:
+                  type: string
+                prodiId:
+                  type: number
+                password:
+                  type: string
+                email:
+                  type: string
+
+      responses:
+        '200':
+          description: OK
+
