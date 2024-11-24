@@ -31,13 +31,10 @@ async function getUserByID(userId) {
   u.Email, 
   u.ProdiID, 
   u.UserPhoto,
-  p.ProdiName, 
-  u.LecturerGuardianID, 
-  lg.Name AS LecturerGuardianName
+  p.ProdiName
 FROM 
   tblUser u 
   INNER JOIN tblProdi p ON u.ProdiID = p.ProdiID 
-  LEFT JOIN tblUser lg ON u.LecturerGuardianID = lg.UserID
   WHERE u.UserID = ${userId};`);
 
   const data = helper.emptyOrRows(result);

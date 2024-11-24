@@ -15,7 +15,18 @@ async function approve(req, res, next) {
       await submissionService.approve(req.params.submissionId, req.params.accessId)
     );
   } catch (err) {
-    console.error(`Error while getting submission detail`, err.message);
+    console.error(`Error while approve submission`, err.message);
+    next(err);
+  }
+}
+
+async function reject(req, res, next) {
+  try {
+    res.json(
+      await submissionService.reject(req.params.submissionId, req.params.accessId)
+    );
+  } catch (err) {
+    console.error(`Error while reject submission`, err.message);
     next(err);
   }
 }
@@ -65,6 +76,7 @@ async function deleteSubmission(req, res, next) {
 module.exports = {
   submit,
   approve,
+  reject,
   getSubmissions,
   getSubmissionDetail,
   getSubmissionByAccessID,

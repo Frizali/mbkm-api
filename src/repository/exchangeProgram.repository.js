@@ -1,15 +1,47 @@
 const db = require("./db.service");
 const helper = require("../utils/helper.util");
 
-async function addExchangeProgram(submissionId,exchangeProgram) {
-    const result = await db.query(`INSERT INTO tblExchangeProgram VALUES(?,?,?,?,?)`,
+async function getExchangeProgramBySubmissionID(submissionId) {
+    const rows = await db.query(`SELECT * FROM tblExchangeProgram WHERE SubmissionID = '${submissionId}'`);
+
+    const data = helper.emptyOrRows(rows);
+    return data[0];
+}
+
+async function getCoursesByExchangeID(exchangeId) {
+    const rows = await db.query(`SELECT * FROM tblCourse WHERE ExchangeID = '${exchangeId}'`);
+
+    const data = helper.emptyOrRows(rows);
+    return data;
+}
+
+async function addCourse(exchangeId,course) {
+    const result = await db.query(`INSERT INTO tblCourse (CourseCode,CourseName,Credits,ExchangeID) VALUES(?,?,?,?)`,
         [
-            exchangeProgram.id,
-            submissionId,
-            exchangeProgram.courseCode,
-            exchangeProgram.courseName,
-            exchangeProgram.credits
+            course.courseCode,
+            course.courseName,
+            course.credits,
+            exchangeId
         ]);
+
+    let message = "Error in add Course";
+
+    if (result.affectedRows) {
+        message = "Course created successfully";
+    }
+    
+    return { message };
+}
+
+async function addExchangeProgram(exchangeId,submissionId,exchangeProgram) {
+    const result = await db.query(`INSERT INTO tblExchangeProgram VALUES(?,?,?,?)`,
+        [
+            exchangeId,
+            submissionId,
+            exchangeProgram.TypeExchange,
+            exchangeProgram.StudyProgramObjective
+        ]
+    )
 
     let message = "Error in add Exchange Program";
 
@@ -21,5 +53,8 @@ async function addExchangeProgram(submissionId,exchangeProgram) {
 }
 
 module.exports = {
-    addExchangeProgram
+    addCourse,
+    addExchangeProgram,
+    getExchangeProgramBySubmissionID,
+    getCoursesByExchangeID
 }

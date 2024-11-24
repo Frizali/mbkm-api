@@ -4,13 +4,12 @@ const helper = require("../utils/helper.util");
 async function create(submissionId, s) {
   const result = await db.query(
     `INSERT INTO tblSubmission
-    (SubmissionID,StudentID,ProdiID,SubmissionDate,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails,SupervisorID)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    (SubmissionID,StudentID,ProdiID,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails,LecturerGuardianID,Status,SubmissionDate)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())`,
     [
       submissionId,
       s.StudentID,
       s.ProdiID,
-      new Date().toISOString().slice(0, 10),
       s.ProgramType,
       s.Reason,
       s.Title,
@@ -19,7 +18,8 @@ async function create(submissionId, s) {
       s.EndDate,
       s.Position,
       s.ActivityDetails,
-      s.SupervisorID
+      s.LecturerGuardianID,
+      'Processing'
     ]
   );
 
@@ -108,7 +108,7 @@ WHERE
 
 async function getSubmissionById(submissionId) {
   const submission = await db.query(
-    `SELECT * FROM tblSubmission WHERE SubmissionID='${submissionId}'`
+    `SELECT s.*,u.Name AS LecturerGuardianName FROM tblSubmission s LEFT JOIN tblUser u ON s.LecturerGuardianID = u.UserID WHERE SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submission);
   return data[0];
@@ -220,6 +220,18 @@ WHERE
   return data[0];
 }
 
+async function updateSubmissionStatus(submissionId, status) {
+  const result = await db.query(`UPDATE tblSubmission SET Status='${status}' WHERE SubmissionID = '${submissionId}'`);
+
+  let message = "Error in update Submission Status";
+
+  if (result.affectedRows) {
+    message = "Submission Status updated successfully";
+  }
+
+  return { message };
+}
+
 async function deleteSubmission(submissionId) {
   await db.query(
     `DELETE FROM tblSubmission WHERE SubmissionID = '${submissionId}'`
@@ -239,15 +251,16 @@ async function getNextApprover(prodiId, level) {
 
 module.exports = {
   create,
+  createSubmissionApproval,
   getSubmissions,
   getSubmissionById,
   getSubmissionAttBySubId,
   getSubmissionByAccessID,
   getFirstApproverByProdiId,
-  createSubmissionApproval,
   getSubmissionApprovalBySubmission,
   getCurrentApprover,
   getNextApprover,
   updateSubmissionApproval,
+  updateSubmissionStatus,
   deleteSubmission,
 };

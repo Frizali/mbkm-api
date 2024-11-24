@@ -1,16 +1,21 @@
 const submissionRepo = require("../repository/submission.repository");
 const userRepo = require("../repository/user.repository");
+const exchangeProgramRepo = require("../repository/exchangeProgram.repository");
 
 async function submit(submission) {
     const firstApprover = await submissionRepo.getFirstApproverByProdiId(submission.ProdiID);
     if(!firstApprover) throw new Error('No Approver on this prodi, please set level approver');
 
-    const uuid = uuidv4();
-    await submissionRepo.create(uuid,submission);
+    const submissionId = uuidv4();
+    await submissionRepo.create(submissionId,submission);
     if(submission.ProgramType == "Pertukaran Pelajar"){
-        
+        const exchangeId = uuidv4();
+        await exchangeProgramRepo.addExchangeProgram(exchangeId,submissionId,submission.ExchangeProgram);
+        submission.ExchangeProgram.Courses.forEach(async (item) => {
+            await exchangeProgramRepo.addCourse(exchangeId,item);
+        })
     }
-    return await submissionRepo.createSubmissionApproval(uuid,firstApprover.ApproverID,'Pending');
+    return await submissionRepo.createSubmissionApproval(submissionId,firstApprover.ApproverID,'Pending');
 }
 
 async function approve(submissionId, accessId) {
@@ -25,9 +30,24 @@ async function approve(submissionId, accessId) {
 
     if(nextApprover){
         await submissionRepo.createSubmissionApproval(submissionId, nextApprover.ApproverID, 'Pending');
+    }else{
+        await submissionRepo.updateSubmissionStatus(submissionId,'Approved');
     }
 
     let message = "Submission has been approved"
+    return { message }
+}
+
+async function reject(submissionId, accessId) {
+    let currApprover = await submissionRepo.getCurrentApprover(submissionId, accessId);
+    if(!currApprover) throw new Error('You dont have access to reject this submission');
+
+    await  Promise.all([
+        submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, 'Rejected'),
+        submissionRepo.updateSubmissionStatus(submissionId,'Approved')
+    ]);
+
+    let message = "Submission has been rejected"
     return { message }
 }
 
@@ -48,11 +68,17 @@ function dateFormatted(dateId){
 }
 
 async function getSubmissionDetail(submissionId) {
-    let [submission,subApproval, subAttachment] = await Promise.all([
+    let [submission,subApproval,subAttachment,exchangeProgram] = await Promise.all([
         submissionRepo.getSubmissionById(submissionId),
         submissionRepo.getSubmissionApprovalBySubmission(submissionId),
-        submissionRepo.getSubmissionAttBySubId(submissionId)
+        submissionRepo.getSubmissionAttBySubId(submissionId),
+        exchangeProgramRepo.getExchangeProgramBySubmissionID(submissionId)
     ]);
+
+    if(exchangeProgram){
+        const courses = await exchangeProgramRepo.getCoursesByExchangeID(exchangeProgram.ExchangeID);
+        exchangeProgram.Courses = courses
+    }
 
     subAttachment = subAttachment.map(item => ({
         ...item,
@@ -65,6 +91,7 @@ async function getSubmissionDetail(submissionId) {
         submission: submission,
         submissionApproval: subApproval,
         submissionAttachment: subAttachment,
+        exchangeProgram:exchangeProgram,
         student: studentDetail
     }
 }
@@ -113,5 +140,6 @@ module.exports = {
     getSubmissionDetail,
     getSubmissionByAccessID,
     deleteSubmission,
-    approve
+    approve,
+    reject
 }
