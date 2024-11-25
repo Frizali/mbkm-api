@@ -2,21 +2,21 @@ const db = require("./db.service");
 const helper = require("../utils/helper.util");
 
 async function getExchangeProgramBySubmissionID(submissionId) {
-    const rows = await db.query(`SELECT * FROM tblExchangeProgram WHERE SubmissionID = '${submissionId}'`);
+    const rows = await db.query(`SELECT * FROM tblexchangeprogram WHERE SubmissionID = '${submissionId}'`);
 
     const data = helper.emptyOrRows(rows);
     return data[0];
 }
 
 async function getCoursesByExchangeID(exchangeId) {
-    const rows = await db.query(`SELECT * FROM tblCourse WHERE ExchangeID = '${exchangeId}'`);
+    const rows = await db.query(`SELECT * FROM tblcourse WHERE ExchangeID = '${exchangeId}'`);
 
     const data = helper.emptyOrRows(rows);
     return data;
 }
 
 async function addCourse(exchangeId,course) {
-    const result = await db.query(`INSERT INTO tblCourse (CourseCode,CourseName,Credits,ExchangeID) VALUES(?,?,?,?)`,
+    const result = await db.query(`INSERT INTO tblcourse (CourseCode,CourseName,Credits,ExchangeID) VALUES(?,?,?,?)`,
         [
             course.courseCode,
             course.courseName,
@@ -34,7 +34,7 @@ async function addCourse(exchangeId,course) {
 }
 
 async function addExchangeProgram(exchangeId,submissionId,exchangeProgram) {
-    const result = await db.query(`INSERT INTO tblExchangeProgram VALUES(?,?,?,?)`,
+    const result = await db.query(`INSERT INTO tblexchangeprogram VALUES(?,?,?,?)`,
         [
             exchangeId,
             submissionId,

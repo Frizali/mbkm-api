@@ -2,19 +2,19 @@ const db = require("./db.service");
 const helper = require("../utils/helper.util");
 
 async function getAccessByID(accessId) {
-  const rows = await db.query(`SELECT * FROM tblAccess WHERE AccessID=?`,[accessId]);
+  const rows = await db.query(`SELECT * FROM tblaccess WHERE AccessID=?`,[accessId]);
   const data = helper.emptyOrRows(rows);
   return data[0];
 }
 
 async function getMenu() {
-  const rows = await db.query(`SELECT * FROM tblMenu`);
+  const rows = await db.query(`SELECT * FROM tblmenu`);
   const data = helper.emptyOrRows(rows);
   return data;
 }
 
 async function getMenuAccessDetailByAccessID(accessId) {
-  const rows = await db.query(`SELECT m.Title,ma.* FROM tblMenuAccess ma INNER JOIN tblMenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID=?;`,[accessId])
+  const rows = await db.query(`SELECT m.Title,ma.* FROM tblmenuaccess ma INNER JOIN tblmenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID=?;`,[accessId])
   const data = helper.emptyOrRows(rows);
   return data.map((item) => {
     return {
@@ -32,7 +32,7 @@ async function getMenuAccessDetailByAccessID(accessId) {
 }
 
 async function getMenuAccess() {
-  const rows = await db.query(`SELECT * FROM tblMenuAccess`);
+  const rows = await db.query(`SELECT * FROM tblmenuaccess`);
   const data = helper.emptyOrRows(rows);
   return data.map((item) => {
     return {

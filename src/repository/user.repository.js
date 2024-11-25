@@ -3,7 +3,7 @@ const helper = require("../utils/helper.util");
 
 async function getUserByEmailOrName(user) {
   const rows = await db.query(
-    `SELECT * FROM tblUser INNER JOIN tblProdi ON tblUser.ProdiID = tblProdi.ProdiID WHERE LOWER(Email) = LOWER('${user}') OR LOWER(Name) = LOWER('${user}')`
+    `SELECT * FROM tbluser INNER JOIN tblprodi ON tbluser.ProdiID = tblprodi.ProdiID WHERE LOWER(Email) = LOWER('${user}') OR LOWER(Name) = LOWER('${user}')`
   );
   const data = helper.emptyOrRows(rows);
   return data[0];
@@ -11,7 +11,7 @@ async function getUserByEmailOrName(user) {
 
 async function createUser(user, password) {
   const result = await db.query(
-    `INSERT INTO tblUser (UserID, Name, ProdiID, Email, Password, AccessID) VALUES(?,?,?,?,?,?)`,
+    `INSERT INTO tbluser (UserID, Name, ProdiID, Email, Password, AccessID) VALUES(?,?,?,?,?,?)`,
     [user.userId, user.name, user.prodiId, user.email, password, '6']
   );
 
@@ -33,8 +33,8 @@ async function getUserByID(userId) {
   u.UserPhoto,
   p.ProdiName
 FROM 
-  tblUser u 
-  INNER JOIN tblProdi p ON u.ProdiID = p.ProdiID 
+  tbluser u 
+  INNER JOIN tblprodi p ON u.ProdiID = p.ProdiID 
   WHERE u.UserID = ${userId};`);
 
   const data = helper.emptyOrRows(result);
@@ -42,13 +42,13 @@ FROM
 }
 
 async function getUserByAccessID(accessId) {
-  const result = await db.query(`SELECT UserID,Name,ProdiID,UserPhoto,Email FROM tblUser WHERE AccessID = ${accessId}`)
+  const result = await db.query(`SELECT UserID,Name,ProdiID,UserPhoto,Email FROM tbluser WHERE AccessID = ${accessId}`)
 
   return helper.emptyOrRows(result)
 }
 
 async function getAvatar() {
-  const rows = await db.query('SELECT UserPhoto AS Avatar, AccessID FROM tblUser');
+  const rows = await db.query('SELECT UserPhoto AS Avatar, AccessID FROM tbluser');
   const data = helper.emptyOrRows(rows);
   return data;
 }

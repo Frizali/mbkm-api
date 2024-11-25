@@ -3,7 +3,7 @@ const helper = require("../utils/helper.util");
 
 async function create(submissionId, s) {
   const result = await db.query(
-    `INSERT INTO tblSubmission
+    `INSERT INTO tblsubmission
     (SubmissionID,StudentID,ProdiID,ProgramType,Reason,Title,InstitutionName,StartDate,EndDate,Position,ActivityDetails,LecturerGuardianID,Status,SubmissionDate)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())`,
     [
@@ -33,7 +33,7 @@ async function create(submissionId, s) {
 }
 
 async function updateSubmissionApproval(submissionId, approverId, status) {
-  const result = await db.query(`UPDATE tblSubmissionApproval SET ApprovalStatus='${status}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`)
+  const result = await db.query(`UPDATE tblsubmissionapproval SET ApprovalStatus='${status}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`)
  
   let message = "Error in update Submission Approval";
 
@@ -46,7 +46,7 @@ async function updateSubmissionApproval(submissionId, approverId, status) {
 
 async function createSubmissionApproval(submissionId, approverId, status) {
   const result = await db.query(
-    `INSERT INTO tblSubmissionApproval (SubmissionID,ApproverID,ApprovalStatus) VALUES (?,?,?)`,
+    `INSERT INTO tblsubmissionapproval (SubmissionID,ApproverID,ApprovalStatus) VALUES (?,?,?)`,
     [submissionId, approverId, status]
   );
 
@@ -65,7 +65,7 @@ async function getSubmissions() {
   p.ProdiName,
   s.* 
 FROM 
-  tblSubmission s 
+  tblsubmission s 
   INNER JOIN (
     SELECT 
       sa.SubmissionID, 
@@ -73,33 +73,33 @@ FROM
         ApprovalStatus, ' By ', AccDescription
       ) AS ApprovalStatus 
     FROM 
-      tblSubmissionApproval sa 
-      INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
+      tblsubmissionapproval sa 
+      INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
       INNER JOIN (
         SELECT 
           SubmissionID, 
           MAX(Level) AS Level 
         FROM 
-          tblSubmissionApproval sa 
-          INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
-          INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID 
+          tblsubmissionapproval sa 
+          INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+          INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
         GROUP BY 
           SubmissionID
       ) AS qryCurrApproval ON (
         sa.SubmissionID = qryCurrApproval.SubmissionID 
         AND a.Level = qryCurrApproval.Level
       ) 
-      LEFT JOIN tblAccess acc ON a.AccessID = acc.AccessID
+      LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
   ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
-  INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID 
-  INNER JOIN tblUser u ON u.UserID = s.StudentID 
+  INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
+  INNER JOIN tbluser u ON u.UserID = s.StudentID 
 WHERE 
   s.SubmissionID IN (
     SELECT 
       sa.SubmissionID 
     FROM 
-      tblApprover a 
-      INNER JOIN tblSubmissionApproval sa ON a.ApproverID = sa.ApproverID 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
   );
 `);
   const data = helper.emptyOrRows(submissions);
@@ -108,7 +108,7 @@ WHERE
 
 async function getSubmissionById(submissionId) {
   const submission = await db.query(
-    `SELECT s.*,u.Name AS LecturerGuardianName FROM tblSubmission s LEFT JOIN tblUser u ON s.LecturerGuardianID = u.UserID WHERE SubmissionID='${submissionId}'`
+    `SELECT s.*,u.Name AS LecturerGuardianName FROM tblsubmission s LEFT JOIN tbluser u ON s.LecturerGuardianID = u.UserID WHERE SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submission);
   return data[0];
@@ -116,7 +116,7 @@ async function getSubmissionById(submissionId) {
 
 async function getSubmissionAttBySubId(submissionId) {
   const submissionAttachment = await db.query(
-    `SELECT * FROM tblSubmissionAttachment WHERE SubmissionID='${submissionId}'`
+    `SELECT * FROM tblsubmissionattachment WHERE SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submissionAttachment);
   return data;
@@ -127,8 +127,8 @@ async function getSubmissionByAccessID(accessId, userId) {
     SELECT 
       sa.SubmissionID 
     FROM 
-      tblApprover a 
-      INNER JOIN tblSubmissionApproval sa ON a.ApproverID = sa.ApproverID 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
     WHERE 
       a.AccessID = ${accessId}
       AND sa.ApprovalStatus = 'Pending'
@@ -145,7 +145,7 @@ async function getSubmissionByAccessID(accessId, userId) {
   qryApproval.ApprovalStatus AS CurrentApproval,
   s.* 
 FROM 
-  tblSubmission s 
+  tblsubmission s 
   INNER JOIN (
     SELECT 
       sa.SubmissionID, 
@@ -153,26 +153,26 @@ FROM
         ApprovalStatus, ' By ', AccDescription
       ) AS ApprovalStatus 
     FROM 
-      tblSubmissionApproval sa 
-      INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
+      tblsubmissionapproval sa 
+      INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
       INNER JOIN (
         SELECT 
           SubmissionID, 
           MAX(Level) AS Level 
         FROM 
-          tblSubmissionApproval sa 
-          INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID 
-          INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID 
+          tblsubmissionapproval sa 
+          INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+          INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
         GROUP BY 
           SubmissionID
       ) AS qryCurrApproval ON (
         sa.SubmissionID = qryCurrApproval.SubmissionID 
         AND a.Level = qryCurrApproval.Level
       ) 
-      LEFT JOIN tblAccess acc ON a.AccessID = acc.AccessID
+      LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
   ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
-  INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID 
-  INNER JOIN tblUser u ON u.UserID = s.StudentID 
+  INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
+  INNER JOIN tbluser u ON u.UserID = s.StudentID 
 WHERE ${filter}
 `
   );
@@ -183,7 +183,7 @@ WHERE ${filter}
 
 async function getFirstApproverByProdiId(prodiId) {
   const approver = await db.query(
-    `SELECT * FROM tblApprover WHERE ProdiID=${prodiId} ORDER BY Level LIMIT 1;`
+    `SELECT * FROM tblapprover WHERE ProdiID=${prodiId} ORDER BY Level LIMIT 1;`
   );
   const data = helper.emptyOrRows(approver);
   return data[0];
@@ -191,7 +191,7 @@ async function getFirstApproverByProdiId(prodiId) {
 
 async function getSubmissionApprovalBySubmission(submissionId) {
   const approver = await db.query(
-    `SELECT acc.AccDescription,a.Level,sa.* FROM tblSubmissionApproval sa INNER JOIN tblApprover a ON sa.ApproverID = a.ApproverID INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID WHERE sa.SubmissionID = '${submissionId}';`
+    `SELECT acc.AccDescription,a.Level,sa.* FROM tblsubmissionapproval sa INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID WHERE sa.SubmissionID = '${submissionId}';`
   );
   const data = helper.emptyOrRows(approver);
   return data;
@@ -201,13 +201,13 @@ async function getCurrentApprover(submissionId, accessId) {
   const currApprover = await db.query(`SELECT 
   * 
 FROM 
-  tblSubmissionApproval sa 
+  tblsubmissionapproval sa 
   INNER JOIN (
     SELECT 
       a.* 
     FROM 
-      tblApprover a 
-      INNER JOIN tblAccess acc ON a.AccessID = acc.AccessID 
+      tblapprover a 
+      INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
     WHERE 
       a.AccessID = ${accessId}
   ) AS qryApprover ON sa.ApproverID = qryApprover.ApproverID 
@@ -221,7 +221,7 @@ WHERE
 }
 
 async function updateSubmissionStatus(submissionId, status) {
-  const result = await db.query(`UPDATE tblSubmission SET Status='${status}' WHERE SubmissionID = '${submissionId}'`);
+  const result = await db.query(`UPDATE tblsubmission SET Status='${status}' WHERE SubmissionID = '${submissionId}'`);
 
   let message = "Error in update Submission Status";
 
@@ -234,7 +234,7 @@ async function updateSubmissionStatus(submissionId, status) {
 
 async function deleteSubmission(submissionId) {
   await db.query(
-    `DELETE FROM tblSubmission WHERE SubmissionID = '${submissionId}'`
+    `DELETE FROM tblsubmission WHERE SubmissionID = '${submissionId}'`
   );
 
   let message = "Submission has been deleted";
@@ -243,7 +243,7 @@ async function deleteSubmission(submissionId) {
 }
 
 async function getNextApprover(prodiId, level) {
-  const approver = await db.query(`SELECT * FROM tblApprover WHERE ProdiID = ${prodiId} AND Level = ${level}`)
+  const approver = await db.query(`SELECT * FROM tblapprover WHERE ProdiID = ${prodiId} AND Level = ${level}`)
 
   const data = helper.emptyOrRows(approver);
   return data[0];
