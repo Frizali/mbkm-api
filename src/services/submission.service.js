@@ -31,7 +31,7 @@ async function approve(submissionId, accessId) {
     if(!currApprover) throw new Error('You dont have access to approve this submission');
 
     await  Promise.all([
-        submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, 'Approved')
+        submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, '','Approved')
     ])
     
     let nextApprover = await submissionRepo.getNextApprover(currApprover.ProdiID, currApprover.Level + 1);
@@ -46,13 +46,13 @@ async function approve(submissionId, accessId) {
     return { message }
 }
 
-async function reject(submissionId, accessId) {
+async function reject(submissionId, accessId, body) {
     let currApprover = await submissionRepo.getCurrentApprover(submissionId, accessId);
     if(!currApprover) throw new Error('You dont have access to reject this submission');
 
     await  Promise.all([
-        submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, 'Rejected'),
-        submissionRepo.updateSubmissionStatus(submissionId,'Approved')
+        submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, body.note,'Rejected'),
+        submissionRepo.updateSubmissionStatus(submissionId,'Rejected')
     ]);
 
     let message = "Submission has been rejected"
@@ -90,11 +90,11 @@ async function getSubmissionDetail(submissionId) {
 
     subAttachment = subAttachment.map(item => ({
         ...item,
-        Base64: item.Base64.toString('base64')
+        Base64: item.Base64?.toString('base64')
     }));
 
     let studentDetail = await userRepo.getUserByID(submission.StudentID);
-    studentDetail.UserPhoto = studentDetail.UserPhoto.toString('base64')
+    studentDetail.UserPhoto = studentDetail.UserPhoto?.toString('base64')
     return {
         submission: submission,
         submissionApproval: subApproval,

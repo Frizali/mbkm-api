@@ -23,7 +23,7 @@ async function approve(req, res, next) {
 async function reject(req, res, next) {
   try {
     res.json(
-      await submissionService.reject(req.params.submissionId, req.params.accessId)
+      await submissionService.reject(req.params.submissionId, req.params.accessId, req.body)
     );
   } catch (err) {
     console.error(`Error while reject submission`, err.message);

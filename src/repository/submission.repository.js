@@ -32,8 +32,8 @@ async function create(submissionId, s) {
   return { message };
 }
 
-async function updateSubmissionApproval(submissionId, approverId, status) {
-  const result = await db.query(`UPDATE tblsubmissionapproval SET ApprovalStatus='${status}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`)
+async function updateSubmissionApproval(submissionId, approverId, note, status) {
+  const result = await db.query(`UPDATE tblsubmissionapproval SET ApprovalStatus='${status}', Note='${note}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`)
  
   let message = "Error in update Submission Approval";
 
