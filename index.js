@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3001;
 
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({

@@ -10,5 +10,6 @@ router.get('/pending-submission/:accessId', authenticateToken.authenticateToken,
 router.delete('/submission/:submissionId', authenticateToken.authenticateToken, submissionController.deleteSubmission);
 router.post('/submission/approve/:submissionId/:accessId', authenticateToken.authenticateToken, submissionController.approve);
 router.post('/submission/reject/:submissionId/:accessId', authenticateToken.authenticateToken, submissionController.reject);
+router.put('/submission/re-assign', authenticateToken.authenticateToken, submissionController.reAssign);
 
 module.exports = router;

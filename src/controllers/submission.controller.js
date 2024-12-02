@@ -73,10 +73,20 @@ async function deleteSubmission(req, res, next) {
   }
 }
 
+async function reAssign(req, res, next) {
+  try {
+    res.json(await submissionService.updateLucturerSubmission(req.body));
+  } catch (err) {
+    console.error(`Error while Re-Assign`, err.message);
+    next(err);
+  }
+}
+
 module.exports = {
   submit,
   approve,
   reject,
+  reAssign,
   getSubmissions,
   getSubmissionDetail,
   getSubmissionByAccessID,

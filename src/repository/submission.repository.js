@@ -249,6 +249,23 @@ async function getNextApprover(prodiId, level) {
   return data[0];
 }
 
+async function updateLucturerSubmission(submissionId, lecturerGuardianID) {
+  const result = await db.query(`UPDATE tblsubmission SET LecturerGuardianID = ? WHERE SubmissionID = ?`,
+    [
+      lecturerGuardianID,
+      submissionId
+    ]
+  )
+
+  let message = "Error in update lecturer";
+
+  if (result.affectedRows) {
+    message = "Submission updated successfully";
+  }
+
+  return { message };
+}
+
 module.exports = {
   create,
   createSubmissionApproval,
@@ -262,5 +279,6 @@ module.exports = {
   getNextApprover,
   updateSubmissionApproval,
   updateSubmissionStatus,
+  updateLucturerSubmission,
   deleteSubmission,
 };

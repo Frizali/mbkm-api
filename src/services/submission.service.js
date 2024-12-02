@@ -1,6 +1,7 @@
 const submissionRepo = require("../repository/submission.repository");
 const userRepo = require("../repository/user.repository");
 const exchangeProgramRepo = require("../repository/exchangeProgram.repository");
+const attachmentRepo = require("../repository/attachment.repository")
 
 async function submit(submission) {
     const firstApprover = await submissionRepo.getFirstApproverByProdiId(submission.ProdiID);
@@ -15,6 +16,13 @@ async function submit(submission) {
             await exchangeProgramRepo.addCourse(exchangeId,item);
         })
     }
+
+    if(submission.Attachment.length > 0){
+        submission.Attachment.forEach(async (item) => {
+            await attachmentRepo.addAttachment(submissionId,item)
+        })
+    }
+
     return await submissionRepo.createSubmissionApproval(submissionId,firstApprover.ApproverID,'Pending');
 }
 
@@ -125,6 +133,10 @@ async function deleteSubmission(submissionId, req) {
     return await submissionRepo.deleteSubmission(submissionId);
 }
 
+async function updateLucturerSubmission(body) {
+    await submissionRepo.updateLucturerSubmission(body.SubmissionID,body.LecturerGuardianID)
+}
+
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     .replace(/[xy]/g, function (c) {
@@ -141,5 +153,6 @@ module.exports = {
     getSubmissionByAccessID,
     deleteSubmission,
     approve,
+    updateLucturerSubmission,
     reject
 }

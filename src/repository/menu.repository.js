@@ -14,7 +14,7 @@ async function getMenu() {
 }
 
 async function getMenuAccessDetailByAccessID(accessId) {
-  const rows = await db.query(`SELECT m.Title,ma.* FROM tblmenuaccess ma INNER JOIN tblmenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID=?;`,[accessId])
+  const rows = await db.query(`SELECT m.Title,ma.* FROM tblmenuaccess ma INNER JOIN tblmenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID=? AND m.MenuID <> m.ParentID;`,[accessId])
   const data = helper.emptyOrRows(rows);
   return data.map((item) => {
     return {

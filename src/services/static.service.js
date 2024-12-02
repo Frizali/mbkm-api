@@ -57,7 +57,7 @@ async function getBreadcrumbPath() {
 
   menus.forEach((item) => {
     let key = item.Path
-    let value = item.Title
+    let value = item.BreadcrumbName
 
     breadcrumbPath[key] = value
   });
@@ -78,7 +78,7 @@ async function getRoleDetail() {
 
   return roles.map(role => ({
     ...role,
-    users: userAvatar.filter(user => user.AccessID === role.AccessID).map(x => x.Avatar.toString('base64'))
+    users: userAvatar.filter(user => user.AccessID === role.AccessID).map(x => x.Avatar?.toString('base64'))
   }))
 }
 
@@ -93,5 +93,5 @@ module.exports = {
   getBreadcrumbPath,
   getRoleDetail,
   getMenuAccessDetailByAccessID,
-  getUserByAccessID
+  getUserByAccessID,
 };
