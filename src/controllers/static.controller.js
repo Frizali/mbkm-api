@@ -2,7 +2,7 @@ const staticService = require("../services/static.service");
 
 async function getMenu(req, res, next) {
   try {
-    res.json(await staticService.getMenuByAccess(req.params.accessId));
+    res.json(await staticService.getMenuByAccess(req.user.accessId));
   } catch (err) {
     console.error(`Error while getting menus`, err.message);
     next(err);
@@ -29,7 +29,7 @@ async function getBreadcrumbPath(req, res, next) {
 
 async function getColumnSetup(req, res, next) {
   try {
-    res.json(await staticService.getColumnSetup(req.params.type, req.params.accessId));
+    res.json(await staticService.getColumnSetup(req.params.type, req.user.accessId));
   } catch (err) {
     console.error(`Error while getting menus`, err.message);
     next(err);

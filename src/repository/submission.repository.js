@@ -181,6 +181,46 @@ WHERE ${filter}
   return data;
 }
 
+async function getSubmissionByProdiID(prodiId) {
+  const submissions = await db.query(`SELECT 
+  u.Name, 
+  p.ProdiName,
+  qryApproval.ApprovalStatus AS CurrentApproval,
+  s.* 
+FROM 
+  tblsubmission s 
+  INNER JOIN (
+    SELECT 
+      sa.SubmissionID, 
+      CONCAT(
+        ApprovalStatus, ' By ', AccDescription
+      ) AS ApprovalStatus 
+    FROM 
+      tblsubmissionapproval sa 
+      INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+      INNER JOIN (
+        SELECT 
+          SubmissionID, 
+          MAX(Level) AS Level 
+        FROM 
+          tblsubmissionapproval sa 
+          INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+          INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
+        GROUP BY 
+          SubmissionID
+      ) AS qryCurrApproval ON (
+        sa.SubmissionID = qryCurrApproval.SubmissionID 
+        AND a.Level = qryCurrApproval.Level
+      ) 
+      LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
+  ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
+  INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
+  INNER JOIN tbluser u ON u.UserID = s.StudentID  WHERE s.ProdiID = '${prodiId}'`)
+
+  const data = helper.emptyOrRows(submissions);
+  return data;
+}
+
 async function getFirstApproverByProdiId(prodiId) {
   const approver = await db.query(
     `SELECT * FROM tblapprover WHERE ProdiID=${prodiId} ORDER BY Level LIMIT 1;`
@@ -273,6 +313,7 @@ module.exports = {
   getSubmissionById,
   getSubmissionAttBySubId,
   getSubmissionByAccessID,
+  getSubmissionByProdiID,
   getFirstApproverByProdiId,
   getSubmissionApprovalBySubmission,
   getCurrentApprover,

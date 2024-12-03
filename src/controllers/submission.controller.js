@@ -12,7 +12,7 @@ async function submit(req, res, next) {
 async function approve(req, res, next) {
   try {
     res.json(
-      await submissionService.approve(req.params.submissionId, req.params.accessId)
+      await submissionService.approve(req.params.submissionId, req.user.accessId)
     );
   } catch (err) {
     console.error(`Error while approve submission`, err.message);
@@ -23,7 +23,7 @@ async function approve(req, res, next) {
 async function reject(req, res, next) {
   try {
     res.json(
-      await submissionService.reject(req.params.submissionId, req.params.accessId, req.body)
+      await submissionService.reject(req.params.submissionId, req.user.accessId, req.body)
     );
   } catch (err) {
     console.error(`Error while reject submission`, err.message);
@@ -54,7 +54,18 @@ async function getSubmissionDetail(req, res, next) {
 async function getSubmissionByAccessID(req, res, next) {
   try {
     res.json(
-      await submissionService.getSubmissionByAccessID(req.params.accessId, req)
+      await submissionService.getSubmissionByAccessID(req.user.accessId, req)
+    );
+  } catch (err) {
+    console.error(`Error while getting submission detail`, err.message);
+    next(err);
+  }
+}
+
+async function getSubmissionByProdiID(req, res, next) {
+  try {
+    res.json(
+      await submissionService.getSubmissionByProdiID(req.user.prodiId)
     );
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);
@@ -90,5 +101,6 @@ module.exports = {
   getSubmissions,
   getSubmissionDetail,
   getSubmissionByAccessID,
+  getSubmissionByProdiID,
   deleteSubmission,
 };

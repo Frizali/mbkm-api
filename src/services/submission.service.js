@@ -2,6 +2,7 @@ const submissionRepo = require("../repository/submission.repository");
 const userRepo = require("../repository/user.repository");
 const exchangeProgramRepo = require("../repository/exchangeProgram.repository");
 const attachmentRepo = require("../repository/attachment.repository")
+const mailService = require("./mail.service")
 
 async function submit(submission) {
     const firstApprover = await submissionRepo.getFirstApproverByProdiId(submission.ProdiID);
@@ -40,6 +41,7 @@ async function approve(submissionId, accessId) {
         await submissionRepo.createSubmissionApproval(submissionId, nextApprover.ApproverID, 'Pending');
     }else{
         await submissionRepo.updateSubmissionStatus(submissionId,'Approved');
+        await mailService.sendFeedBackSubmission("m.fahrizalipradana@gmail.com");
     }
 
     let message = "Submission has been approved"
@@ -124,6 +126,23 @@ async function getSubmissionByAccessID(accessId, req) {
     }));
 }
 
+async function getSubmissionByProdiID(prodiId) {
+    const submissions = await submissionRepo.getSubmissionByProdiID(prodiId);
+    submissions.forEach(submission => {
+        submission.SubmissionDate = dateFormatted(submission.SubmissionDate);
+        submission.StartDate = dateFormatted(submission.StartDate);
+        submission.EndDate = dateFormatted(submission.EndDate);
+    });
+
+    return await Promise.all(submissions.map(async (item) => {
+        let submissionApproval = await submissionRepo.getSubmissionApprovalBySubmission(item.SubmissionID);
+        return {
+            ...item,
+            ApprovalStatus: submissionApproval
+        };
+    }));
+}
+
 async function deleteSubmission(submissionId, req) {
     const user = req.user;
     var accessId = parseInt(user.accessId);
@@ -151,6 +170,7 @@ module.exports = {
     getSubmissions,
     getSubmissionDetail,
     getSubmissionByAccessID,
+    getSubmissionByProdiID,
     deleteSubmission,
     approve,
     updateLucturerSubmission,
