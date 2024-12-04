@@ -19,7 +19,7 @@ async function create(submissionId, s) {
       s.Position,
       s.ActivityDetails,
       s.LecturerGuardianID,
-      'Processing'
+      "Processing",
     ]
   );
 
@@ -32,9 +32,16 @@ async function create(submissionId, s) {
   return { message };
 }
 
-async function updateSubmissionApproval(submissionId, approverId, note, status) {
-  const result = await db.query(`UPDATE tblsubmissionapproval SET ApprovalStatus='${status}', Note='${note}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`)
- 
+async function updateSubmissionApproval(
+  submissionId,
+  approverId,
+  note,
+  status
+) {
+  const result = await db.query(
+    `UPDATE tblsubmissionapproval SET ApprovalStatus='${status}', Note='${note}', ApprovalDate = NOW()  WHERE SubmissionID='${submissionId}' AND ApproverID=${approverId}`
+  );
+
   let message = "Error in update Submission Approval";
 
   if (result.affectedRows) {
@@ -106,9 +113,18 @@ WHERE
   return data;
 }
 
-async function getSubmissionById(submissionId) {
+async function getSubmissionById(submissionId, accessId) {
   const submission = await db.query(
-    `SELECT s.*,u.Name AS LecturerGuardianName FROM tblsubmission s LEFT JOIN tbluser u ON s.LecturerGuardianID = u.UserID WHERE SubmissionID='${submissionId}'`
+    `SELECT s.*,u.Name AS LecturerGuardianName FROM tblsubmission s LEFT JOIN tbluser u ON s.LecturerGuardianID = u.UserID 
+       LEFT JOIN (SELECT 
+      sa.SubmissionID ,
+      IF(sa.ApprovalStatus = 'Pending',0,1) AS IsApprove
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID
+    WHERE SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submission);
   return data[0];
@@ -143,6 +159,7 @@ async function getSubmissionByAccessID(accessId, userId) {
   u.Name, 
   p.ProdiName,
   qryApproval.ApprovalStatus AS CurrentApproval,
+  qryIsApprove.IsApprove,
   s.* 
 FROM 
   tblsubmission s 
@@ -173,19 +190,27 @@ FROM
   ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
   INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
   INNER JOIN tbluser u ON u.UserID = s.StudentID 
-WHERE ${filter}
-`
+  LEFT JOIN (SELECT 
+      sa.SubmissionID ,
+      IF(sa.ApprovalStatus = 'Pending',0,1) AS IsApprove
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID
+WHERE ${filter}`
   );
 
   const data = helper.emptyOrRows(submissions);
   return data;
 }
 
-async function getSubmissionByProdiID(prodiId) {
+async function getSubmissionStatus(accessId) {
   const submissions = await db.query(`SELECT 
   u.Name, 
   p.ProdiName,
   qryApproval.ApprovalStatus AS CurrentApproval,
+  qryIsApprove.IsApprove,
   s.* 
 FROM 
   tblsubmission s 
@@ -215,7 +240,25 @@ FROM
       LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
   ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
   INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
-  INNER JOIN tbluser u ON u.UserID = s.StudentID  WHERE s.ProdiID = '${prodiId}'`)
+  INNER JOIN tbluser u ON u.UserID = s.StudentID 
+    LEFT JOIN (SELECT 
+      sa.SubmissionID ,
+      IF(sa.ApprovalStatus = 'Pending',0,1) AS IsApprove
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID
+  WHERE s.SubmissionID IN (
+    SELECT 
+      sa.SubmissionID 
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}
+      AND (sa.ApprovalStatus = 'Pending' OR sa.ApprovalStatus = 'Approved')
+  );`);
 
   const data = helper.emptyOrRows(submissions);
   return data;
@@ -261,7 +304,9 @@ WHERE
 }
 
 async function updateSubmissionStatus(submissionId, status) {
-  const result = await db.query(`UPDATE tblsubmission SET Status='${status}' WHERE SubmissionID = '${submissionId}'`);
+  const result = await db.query(
+    `UPDATE tblsubmission SET Status='${status}' WHERE SubmissionID = '${submissionId}'`
+  );
 
   let message = "Error in update Submission Status";
 
@@ -283,19 +328,19 @@ async function deleteSubmission(submissionId) {
 }
 
 async function getNextApprover(prodiId, level) {
-  const approver = await db.query(`SELECT * FROM tblapprover WHERE ProdiID = ${prodiId} AND Level = ${level}`)
+  const approver = await db.query(
+    `SELECT * FROM tblapprover WHERE ProdiID = ${prodiId} AND Level = ${level}`
+  );
 
   const data = helper.emptyOrRows(approver);
   return data[0];
 }
 
 async function updateLucturerSubmission(submissionId, lecturerGuardianID) {
-  const result = await db.query(`UPDATE tblsubmission SET LecturerGuardianID = ? WHERE SubmissionID = ?`,
-    [
-      lecturerGuardianID,
-      submissionId
-    ]
-  )
+  const result = await db.query(
+    `UPDATE tblsubmission SET LecturerGuardianID = ? WHERE SubmissionID = ?`,
+    [lecturerGuardianID, submissionId]
+  );
 
   let message = "Error in update lecturer";
 
@@ -313,7 +358,7 @@ module.exports = {
   getSubmissionById,
   getSubmissionAttBySubId,
   getSubmissionByAccessID,
-  getSubmissionByProdiID,
+  getSubmisssionStatus: getSubmissionStatus,
   getFirstApproverByProdiId,
   getSubmissionApprovalBySubmission,
   getCurrentApprover,

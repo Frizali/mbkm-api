@@ -62,10 +62,10 @@ async function getSubmissionByAccessID(req, res, next) {
   }
 }
 
-async function getSubmissionByProdiID(req, res, next) {
+async function getSubmissionStatus(req, res, next) {
   try {
     res.json(
-      await submissionService.getSubmissionByProdiID(req.user.prodiId)
+      await submissionService.getSubmissionByProdiID(req.user.accessId)
     );
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);
@@ -101,6 +101,6 @@ module.exports = {
   getSubmissions,
   getSubmissionDetail,
   getSubmissionByAccessID,
-  getSubmissionByProdiID,
+  getSubmissionStatus,
   deleteSubmission,
 };

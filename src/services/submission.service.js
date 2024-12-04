@@ -126,8 +126,8 @@ async function getSubmissionByAccessID(accessId, req) {
     }));
 }
 
-async function getSubmissionByProdiID(prodiId) {
-    const submissions = await submissionRepo.getSubmissionByProdiID(prodiId);
+async function getSubmissionByProdiID(accessId) {
+    const submissions = await submissionRepo.getSubmisssionStatus(accessId);
     submissions.forEach(submission => {
         submission.SubmissionDate = dateFormatted(submission.SubmissionDate);
         submission.StartDate = dateFormatted(submission.StartDate);
