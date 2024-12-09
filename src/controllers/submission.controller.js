@@ -43,7 +43,7 @@ async function getSubmissions(req, res, next) {
 async function getSubmissionDetail(req, res, next) {
   try {
     res.json(
-      await submissionService.getSubmissionDetail(req.params.submissionId)
+      await submissionService.getSubmissionDetail(req.params.submissionId, req.user)
     );
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);

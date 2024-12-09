@@ -77,9 +77,9 @@ function dateFormatted(dateId){
     return date.toLocaleDateString('id-ID', options);
 }
 
-async function getSubmissionDetail(submissionId) {
+async function getSubmissionDetail(submissionId, user) {
     let [submission,subApproval,subAttachment,exchangeProgram] = await Promise.all([
-        submissionRepo.getSubmissionById(submissionId),
+        submissionRepo.getSubmissionById(submissionId, user.accessId),
         submissionRepo.getSubmissionApprovalBySubmission(submissionId),
         submissionRepo.getSubmissionAttBySubId(submissionId),
         exchangeProgramRepo.getExchangeProgramBySubmissionID(submissionId)

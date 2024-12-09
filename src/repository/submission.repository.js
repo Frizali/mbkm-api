@@ -115,7 +115,7 @@ WHERE
 
 async function getSubmissionById(submissionId, accessId) {
   const submission = await db.query(
-    `SELECT s.*,u.Name AS LecturerGuardianName FROM tblsubmission s LEFT JOIN tbluser u ON s.LecturerGuardianID = u.UserID 
+    `SELECT s.*,u.Name AS LecturerGuardianName, qryIsApprove.IsApprove FROM tblsubmission s LEFT JOIN tbluser u ON s.LecturerGuardianID = u.UserID 
        LEFT JOIN (SELECT 
       sa.SubmissionID ,
       IF(sa.ApprovalStatus = 'Pending',0,1) AS IsApprove
@@ -124,7 +124,7 @@ async function getSubmissionById(submissionId, accessId) {
       INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
     WHERE 
       a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID
-    WHERE SubmissionID='${submissionId}'`
+    WHERE s.SubmissionID='${submissionId}'`
   );
   const data = helper.emptyOrRows(submission);
   return data[0];
@@ -248,17 +248,7 @@ FROM
       tblapprover a 
       INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
     WHERE 
-      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID
-  WHERE s.SubmissionID IN (
-    SELECT 
-      sa.SubmissionID 
-    FROM 
-      tblapprover a 
-      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
-    WHERE 
-      a.AccessID = ${accessId}
-      AND (sa.ApprovalStatus = 'Pending' OR sa.ApprovalStatus = 'Approved')
-  );`);
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID;`);
 
   const data = helper.emptyOrRows(submissions);
   return data;
