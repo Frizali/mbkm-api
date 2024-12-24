@@ -254,6 +254,52 @@ FROM
   return data;
 }
 
+async function getCountSubmissionStatus(accessId) {
+  const submissions = await db.query(`SELECT 
+  s.Status,
+  COUNT(s.Status) AS Total
+FROM 
+  tblsubmission s 
+  INNER JOIN (
+    SELECT 
+      sa.SubmissionID, 
+      CONCAT(
+        ApprovalStatus, ' By ', AccDescription
+      ) AS ApprovalStatus 
+    FROM 
+      tblsubmissionapproval sa 
+      INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+      INNER JOIN (
+        SELECT 
+          SubmissionID, 
+          MAX(Level) AS Level 
+        FROM 
+          tblsubmissionapproval sa 
+          INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+          INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
+        GROUP BY 
+          SubmissionID
+      ) AS qryCurrApproval ON (
+        sa.SubmissionID = qryCurrApproval.SubmissionID 
+        AND a.Level = qryCurrApproval.Level
+      ) 
+      LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
+  ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
+  INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
+  INNER JOIN tbluser u ON u.UserID = s.StudentID 
+    LEFT JOIN (SELECT 
+      sa.SubmissionID ,
+      IF(sa.ApprovalStatus = 'Pending',0,1) AS IsApprove
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID GROUP BY s.Status;`);
+
+  const data = helper.emptyOrRows(submissions);
+  return data;
+}
+
 async function getFirstApproverByProdiId(prodiId) {
   const approver = await db.query(
     `SELECT * FROM tblapprover WHERE ProdiID=${prodiId} ORDER BY Level LIMIT 1;`
@@ -348,7 +394,8 @@ module.exports = {
   getSubmissionById,
   getSubmissionAttBySubId,
   getSubmissionByAccessID,
-  getSubmisssionStatus: getSubmissionStatus,
+  getSubmissionStatus,
+  getCountSubmissionStatus,
   getFirstApproverByProdiId,
   getSubmissionApprovalBySubmission,
   getCurrentApprover,

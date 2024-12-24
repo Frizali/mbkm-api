@@ -126,8 +126,8 @@ async function getSubmissionByAccessID(accessId, req) {
     }));
 }
 
-async function getSubmissionByProdiID(accessId) {
-    const submissions = await submissionRepo.getSubmisssionStatus(accessId);
+async function getSubmissionStatus(accessId) {
+    const submissions = await submissionRepo.getSubmissionStatus(accessId);
     submissions.forEach(submission => {
         submission.SubmissionDate = dateFormatted(submission.SubmissionDate);
         submission.StartDate = dateFormatted(submission.StartDate);
@@ -170,7 +170,7 @@ module.exports = {
     getSubmissions,
     getSubmissionDetail,
     getSubmissionByAccessID,
-    getSubmissionByProdiID,
+    getSubmissionStatus,
     deleteSubmission,
     approve,
     updateLucturerSubmission,
