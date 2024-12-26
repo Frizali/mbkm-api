@@ -30,7 +30,7 @@ async function login(params) {
 
   if (bResult) {
     token = jwt.sign({ id: user.UserID, name: user.Name, prodiId: user.ProdiID, prodiName: user.ProdiName, accessId: user.AccessID, isMultiProdi: user.IsMultiProdi == 0 ? false : true }, "mbkm292021173004050301@if@3312311045@*%", {
-      expiresIn: "1h",
+      expiresIn: "24h",
     });
   } else {
     throw new Error("Email or password is incorrect!");
