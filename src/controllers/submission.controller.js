@@ -65,7 +65,7 @@ async function getSubmissionByAccessID(req, res, next) {
 async function getSubmissionStatus(req, res, next) {
   try {
     res.json(
-      await submissionService.getSubmissionByProdiID(req.user.accessId)
+      await submissionService.getSubmissionStatus(req.user.accessId)
     );
   } catch (err) {
     console.error(`Error while getting submission detail`, err.message);

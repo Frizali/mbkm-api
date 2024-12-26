@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MBKM</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      p,
+      h4,
+      h5 {
+        margin: 0;
+        color: #333;
+      }
+
+      .container {
+        width: 100%;
+      }
+
+      .content-container {
+        row-gap: 3rem;
+        margin: auto;
+        width: 100%;
+      }
+
+      .header-container {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 1rem 0;
+        background-color: #3F8CFE;
+        width: 100%;
+        color: white;
+      }
+
+      .header-container > h2 {
+        margin: 0;
+        text-align: center;
+      }
+
+      .title-content {
+        margin-bottom: .5rem;
+      }
+
+      .title-content > p {
+        color: #555;
+      }
+
+      .title-content > p {
+        font-size: 12px;
+      }
+
+      .main-container {
+        box-sizing: border-box;
+        width: 100%;
+        margin: 0 auto;
+        background-color: #fff;
+        border: thin solid #dadce0;
+        padding: 20px 20px;
+        border-top: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+      tr,
+      td {
+        font-size: 14px;
+        color: #555;
+      }
+
+      table {
+        margin-bottom: .5rem;
+        border-collapse: collapse;
+      }
+
+      .description-text {
+        color: #555;
+        text-align: justify;
+        font-size: 12px;
+      }
+
+      .btn-submit {
+        width: max-content;
+        display: block;
+        margin: .5rem auto;
+        padding: 10px 20px;
+        background-color: #3F8CFE;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .btn-submit > a {
+        font-size: 0.8rem;
+        text-decoration: none;
+        color: white;
+      }
+
+      .info {
+        color: #333;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      @media (max-width: 1200px) {
+        .content-container {
+          width: 100%;
+        }
+        .main-container {
+          padding: 2rem 1.5rem;
+          width: 100%;
+        }
+      }
+      @media (max-width: 992px) {
+        .content-container {
+          width: 100%;
+        }
+        .main-container {
+          padding: 2rem 1.5rem;
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 767px) {
+        h2 {
+          font-size: 1.3rem;
+        }
+
+        h5 {
+          font-size: 0.8rem;
+        }
+        .content-container {
+          width: 100%;
+        }
+        .main-container {
+          padding: 2rem 1.5rem;
+          width: 100%;
+        }
+        .title-content > p {
+          font-size: 0.7rem;
+        }
+        tr,
+        td {
+          font-size: 0.8rem;
+        }
+        .info {
+          text-align: center;
+          font-size: 0.7rem;
+        }
+        .description-text {
+          font-size: 0.7rem;
+        }
+
+        .btn-submit > a {
+          font-size: 0.8rem;
+          text-decoration: none;
+          color: white;
+        }
+
+        .info {
+          font-size: 0.7rem;
+          text-align: center;
+        }
+
+        .btn-submit {
+          padding: 6px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content-container">
+        <div class="header-container">
+          <h2>MBKM</h2>
+        </div>
+        <div class="main-container">
+          <div class="title-content">
+            <p>{{Greeting}} {{Name}}</p>
+            <br />
+            <h4>You Submission was {{Status}}</h4>
+            <h4><i>Pengajuan anda <span>{% if Status == "REJECTED" %}telah DITOLAK{% elseif Status == "APPROVED" %}telah DITERIMA{% else %}-{% endif %}
+            </span>,</i></h4>
+          </div>
+          <table>
+            <tr>
+              <td>Date</td>
+              <td>:</td>
+              <td>{{Date}}</td>
+            </tr>
+            <tr>
+              <td>Duration</td>
+              <td>:</td>
+              <td>{{Duration}} hour(s) ({{Fromdate}} to {{ToDate}})</td>
+            </tr>
+            <tr>
+              <td>Note</td>
+              <td>:</td>
+              <td>{{Note}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

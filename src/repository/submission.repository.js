@@ -248,7 +248,54 @@ FROM
       tblapprover a 
       INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
     WHERE 
-      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID;`);
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID
+    WHERE s.ProdiID IN (SELECT ProdiID FROM tblapprover WHERE AccessID = ${accessId});`);
+
+  const data = helper.emptyOrRows(submissions);
+  return data;
+}
+
+async function getCountSubmissionStatus(accessId) {
+  const submissions = await db.query(`SELECT 
+  s.Status,
+  COUNT(s.Status) AS Total
+FROM 
+  tblsubmission s 
+  INNER JOIN (
+    SELECT 
+      sa.SubmissionID, 
+      CONCAT(
+        ApprovalStatus, ' By ', AccDescription
+      ) AS ApprovalStatus 
+    FROM 
+      tblsubmissionapproval sa 
+      INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+      INNER JOIN (
+        SELECT 
+          SubmissionID, 
+          MAX(Level) AS Level 
+        FROM 
+          tblsubmissionapproval sa 
+          INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+          INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
+        GROUP BY 
+          SubmissionID
+      ) AS qryCurrApproval ON (
+        sa.SubmissionID = qryCurrApproval.SubmissionID 
+        AND a.Level = qryCurrApproval.Level
+      ) 
+      LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
+  ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
+  INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
+  INNER JOIN tbluser u ON u.UserID = s.StudentID 
+    LEFT JOIN (SELECT 
+      sa.SubmissionID ,
+      IF(sa.ApprovalStatus = 'Pending',0,1) AS IsApprove
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID GROUP BY s.Status;`);
 
   const data = helper.emptyOrRows(submissions);
   return data;
@@ -341,6 +388,94 @@ async function updateLucturerSubmission(submissionId, lecturerGuardianID) {
   return { message };
 }
 
+// Dashboard
+async function getAllSubmissionStatusGroupByProdi(accessId) {
+  const rows = await db.query(`
+SELECT 
+  p.ProdiName, 
+  SUM(
+    CASE WHEN Status = 'Processing' THEN 1 ELSE 0 END
+  ) AS Processing, 
+  SUM(
+    CASE WHEN Status = 'Approved' THEN 1 ELSE 0 END
+  ) AS Approved, 
+  SUM(
+    CASE WHEN Status = 'Rejected' THEN 1 ELSE 0 END
+  ) AS Rejected 
+FROM 
+  tblsubmission s 
+  INNER JOIN (
+    SELECT 
+      sa.SubmissionID, 
+      CONCAT(
+        ApprovalStatus, ' By ', AccDescription
+      ) AS ApprovalStatus 
+    FROM 
+      tblsubmissionapproval sa 
+      INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+      INNER JOIN (
+        SELECT 
+          SubmissionID, 
+          MAX(Level) AS Level 
+        FROM 
+          tblsubmissionapproval sa 
+          INNER JOIN tblapprover a ON sa.ApproverID = a.ApproverID 
+          INNER JOIN tblaccess acc ON a.AccessID = acc.AccessID 
+        GROUP BY 
+          SubmissionID
+      ) AS qryCurrApproval ON (
+        sa.SubmissionID = qryCurrApproval.SubmissionID 
+        AND a.Level = qryCurrApproval.Level
+      ) 
+      LEFT JOIN tblaccess acc ON a.AccessID = acc.AccessID
+  ) AS qryApproval ON s.SubmissionID = qryApproval.SubmissionID 
+  INNER JOIN tblprodi p ON s.ProdiID = p.ProdiID 
+  INNER JOIN tbluser u ON u.UserID = s.StudentID 
+  LEFT JOIN (
+    SELECT 
+      sa.SubmissionID, 
+      IF(
+        sa.ApprovalStatus = 'Pending', 0, 1
+      ) AS IsApprove 
+    FROM 
+      tblapprover a 
+      INNER JOIN tblsubmissionapproval sa ON a.ApproverID = sa.ApproverID 
+    WHERE 
+      a.AccessID = ${accessId}
+  ) AS qryIsApprove ON s.SubmissionID = qryIsApprove.SubmissionID 
+   WHERE s.ProdiID IN (SELECT ProdiID FROM tblapprover WHERE AccessID = ${accessId})
+GROUP BY 
+  p.ProdiName;
+`);
+  
+  const data = helper.emptyOrRows(rows);
+  return data;
+}
+
+async function getTotalSubmissionGropByProdi(accessId) {
+  const rows = await db.query(`SELECT 
+  ROW_NUMBER() OVER(
+    ORDER BY 
+      (
+        SELECT 
+          NULL
+      )
+  ) AS id, 
+  p.Alias AS label, 
+  COUNT(*) AS value 
+FROM 
+  tblSubmission s 
+  INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID 
+WHERE 
+  s.ProdiID IN (SELECT ProdiID FROM tblapprover WHERE AccessID = ${accessId}) 
+GROUP BY 
+  s.ProdiID;
+  `);
+
+  const data = helper.emptyOrRows(rows);
+  return data;
+}
+
 module.exports = {
   create,
   createSubmissionApproval,
@@ -348,7 +483,8 @@ module.exports = {
   getSubmissionById,
   getSubmissionAttBySubId,
   getSubmissionByAccessID,
-  getSubmisssionStatus: getSubmissionStatus,
+  getSubmissionStatus,
+  getCountSubmissionStatus,
   getFirstApproverByProdiId,
   getSubmissionApprovalBySubmission,
   getCurrentApprover,
@@ -357,4 +493,6 @@ module.exports = {
   updateSubmissionStatus,
   updateLucturerSubmission,
   deleteSubmission,
+  getAllSubmissionStatusGroupByProdi,
+  getTotalSubmissionGropByProdi
 };
