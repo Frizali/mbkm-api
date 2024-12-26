@@ -19,7 +19,7 @@ async function create(submissionId, s) {
       s.Position,
       s.ActivityDetails,
       s.LecturerGuardianID,
-      "Processing",
+      "Waiting Approval",
     ]
   );
 
