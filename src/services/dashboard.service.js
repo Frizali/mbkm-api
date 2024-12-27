@@ -1,15 +1,12 @@
 const submissionRepo = require("../repository/submission.repository");
-const userRepo = require("../repository/user.repository");
-const exchangeProgramRepo = require("../repository/exchangeProgram.repository");
-const attachmentRepo = require("../repository/attachment.repository")
 
 async function getSubmissionStatus(accessId) {
     let data = await submissionRepo.getAllSubmissionStatusGroupByProdi(accessId);
 
     let categories = [];
     let series = [];
-    let processing = {
-        label: "Processing",
+    let pending = {
+        label: "Pending",
         data: [],
         color: "#2196F3"
     };
@@ -26,12 +23,12 @@ async function getSubmissionStatus(accessId) {
 
     data.forEach(e => {
         categories.push(e.ProdiName)
-        processing.data.push(e.Processing)
+        pending.data.push(e.Pending)
         approved.data.push(e.Approved)
         rejected.data.push(e.Rejected)
     });
     
-    series = [processing,approved,rejected]
+    series = [pending,approved,rejected]
 
     return {
         categories: categories,

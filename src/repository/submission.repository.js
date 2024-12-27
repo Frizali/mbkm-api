@@ -19,7 +19,7 @@ async function create(submissionId, s) {
       s.Position,
       s.ActivityDetails,
       s.LecturerGuardianID,
-      "Processing",
+      "Pending",
     ]
   );
 
@@ -47,7 +47,7 @@ async function updateSubmissionApproval(
   if (result.affectedRows) {
     message = "Submission Approval updated successfully";
   }
-
+''
   return { message };
 }
 
@@ -394,8 +394,8 @@ async function getAllSubmissionStatusGroupByProdi(accessId) {
 SELECT 
   p.ProdiName, 
   SUM(
-    CASE WHEN Status = 'Processing' THEN 1 ELSE 0 END
-  ) AS Processing, 
+    CASE WHEN Status = 'Pending' THEN 1 ELSE 0 END
+  ) AS Pending, 
   SUM(
     CASE WHEN Status = 'Approved' THEN 1 ELSE 0 END
   ) AS Approved, 
