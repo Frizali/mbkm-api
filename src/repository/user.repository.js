@@ -12,7 +12,7 @@ async function getUserByEmailOrName(user) {
 async function createUser(user, password) {
   const result = await db.query(
     `INSERT INTO tbluser (UserID, Name, ProdiID, Email, Password, AccessID) VALUES(?,?,?,?,?,?)`,
-    [user.userId, user.name, user.prodiId, user.email, password, '6']
+    [user.userId, user.name, user.prodiId, user.email, password, '1']
   );
 
   let message = "Error in submit Submission";
