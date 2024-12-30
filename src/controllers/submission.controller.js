@@ -73,6 +73,17 @@ async function getSubmissionStatus(req, res, next) {
   }
 }
 
+async function getSubmissionMentorship(req, res, next) {
+  try {
+    res.json(
+      await submissionService.getSubmissionMentorship(req.user.id)
+    );
+  } catch (err) {
+    console.error(`Error while getting submission detail`, err.message);
+    next(err);
+  }
+}
+
 async function deleteSubmission(req, res, next) {
   try {
     res.json(
@@ -102,5 +113,6 @@ module.exports = {
   getSubmissionDetail,
   getSubmissionByAccessID,
   getSubmissionStatus,
+  getSubmissionMentorship,
   deleteSubmission,
 };

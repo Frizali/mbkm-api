@@ -340,6 +340,12 @@ WHERE
   return data[0];
 }
 
+async function getSubmissionMentorship(userId) {
+  const rows = await db.query(`SELECT u.Name,p.ProdiName,s.* FROM tblsubmission s INNER JOIN tblUser u ON s.StudentID = u.UserID INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID WHERE LecturerGuardianID='${userId}' AND s.Status = 'Approved'`);
+  const data = helper.emptyOrRows(rows);
+  return data;
+}
+
 async function updateSubmissionStatus(submissionId, status) {
   const result = await db.query(
     `UPDATE tblsubmission SET Status='${status}' WHERE SubmissionID = '${submissionId}'`
@@ -489,6 +495,7 @@ module.exports = {
   getSubmissionApprovalBySubmission,
   getCurrentApprover,
   getNextApprover,
+  getSubmissionMentorship,
   updateSubmissionApproval,
   updateSubmissionStatus,
   updateLucturerSubmission,

@@ -143,6 +143,23 @@ async function getSubmissionStatus(accessId) {
     }));
 }
 
+async function getSubmissionMentorship(userId) {
+    const submissions = await submissionRepo.getSubmissionMentorship(userId);
+    submissions.forEach(submission => {
+        submission.SubmissionDate = dateFormatted(submission.SubmissionDate);
+        submission.StartDate = dateFormatted(submission.StartDate);
+        submission.EndDate = dateFormatted(submission.EndDate);
+    });
+
+    return await Promise.all(submissions.map(async (item) => {
+        let submissionApproval = await submissionRepo.getSubmissionApprovalBySubmission(item.SubmissionID);
+        return {
+            ...item,
+            ApprovalStatus: submissionApproval
+        };
+    }));
+}
+
 async function deleteSubmission(submissionId, req) {
     const user = req.user;
     var accessId = parseInt(user.accessId);
@@ -171,6 +188,7 @@ module.exports = {
     getSubmissionDetail,
     getSubmissionByAccessID,
     getSubmissionStatus,
+    getSubmissionMentorship,
     deleteSubmission,
     approve,
     updateLucturerSubmission,
