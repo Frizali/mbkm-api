@@ -9,6 +9,15 @@ async function getLogbookBySubmissionID(req, res, next) {
   }
 }
 
+async function getLogbookMentorship(req, res, next) {
+  try {
+    res.json(await logbookService.getLogbookMentorship(req.user.id));
+  } catch (err) {
+    console.error(`Error while get logbook`, err.message);
+    next(err);
+  }
+}
+
 async function createLogbook(req, res, next) {
   try {
     res.json(await logbookService.createLogbook(req.body));
@@ -20,5 +29,6 @@ async function createLogbook(req, res, next) {
 
 module.exports = {
   getLogbookBySubmissionID,
+  getLogbookMentorship,
   createLogbook
 };

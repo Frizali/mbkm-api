@@ -9,6 +9,14 @@ async function getLogbookBySubmissionID(submissionId) {
   return data;
 }
 
+async function getLogbookMentorship(mentorId) {
+  const rows = await db.query(
+    `SELECT * FROM tbllogbook WHERE SubmissionID IN (SELECT SubmissionID FROM tblsubmission WHERE LecturerGuardianID = '${mentorId}')`
+  );
+  const data = helper.emptyOrRows(rows);
+  return data;
+}
+
 async function createLogbook(logbook) {
   const result = await db.query(
     `INSERT INTO tbllogbook (SubmissionID, Date, Label) VALUES(?,?,?)`,
@@ -26,5 +34,6 @@ async function createLogbook(logbook) {
 
 module.exports = {
     getLogbookBySubmissionID,
+    getLogbookMentorship,
     createLogbook
 }

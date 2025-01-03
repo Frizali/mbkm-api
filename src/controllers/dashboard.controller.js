@@ -18,7 +18,27 @@ async function getSubmissionTotal(req, res, next) {
   }
 }
 
+async function getTotalSubmissionMentorship(req, res, next) {
+  try {
+    res.json(await dashboardService.getTotalSubmissionMentorship(req.user.id));
+  } catch (err) {
+    console.error(`Error while get submission total`, err.message);
+    next(err);
+  }
+}
+
+async function getTotalSubmissionProgramTypeMentorship(req, res, next) {
+  try {
+    res.json(await dashboardService.getTotalSubmissionProgramTypeMentorship(req.user.id));
+  } catch (err) {
+    console.error(`Error while get submission total`, err.message);
+    next(err);
+  }
+}
+
 module.exports = {
   getSubmissionStatus,
-  getSubmissionTotal
+  getSubmissionTotal,
+  getTotalSubmissionMentorship,
+  getTotalSubmissionProgramTypeMentorship
 };

@@ -12,6 +12,14 @@ async function getLogbookBySubmissionID(submissionId) {
   }));
 }
 
+async function getLogbookMentorship(mentorId) {
+  let logbooks = await logbookRepo.getLogbookMentorship(mentorId);
+  return logbooks.map((item) => ({
+    ...item,
+    Date: formatDate(item.Date),
+  }));
+}
+
 const formatDate = (date) => {
   const d = new Date(date);
   return d.toISOString().split("T")[0];
@@ -20,4 +28,5 @@ const formatDate = (date) => {
 module.exports = {
   createLogbook,
   getLogbookBySubmissionID,
+  getLogbookMentorship
 };

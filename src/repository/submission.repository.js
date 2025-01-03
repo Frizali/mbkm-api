@@ -458,6 +458,22 @@ GROUP BY
   return data;
 }
 
+async function getTotalSubmissionProgramTypeMentorship(mentorId) {
+  const rows = await db.query(
+    `SELECT
+'Tipe Kegiatan' AS Label,
+SUM(CASE WHEN ProgramType = 'Penilitian /Riset' THEN 1 ELSE 0 END) AS A,
+SUM(CASE WHEN ProgramType = 'Proyek Kemanusiaan' THEN 1 ELSE 0 END) AS B,
+SUM(CASE WHEN ProgramType = 'Studi /Proyek Independen' THEN 1 ELSE 0 END) AS C,
+SUM(CASE WHEN ProgramType = 'Magang Praktik Kerja' THEN 1 ELSE 0 END) AS D,
+SUM(CASE WHEN ProgramType = 'Asistensi Mengajar di Satuan Pendidikan' THEN 1 ELSE 0 END) AS E,
+SUM(CASE WHEN ProgramType = 'Pertukaran Pelajar' THEN 1 ELSE 0 END) AS F
+FROM tblsubmission WHERE SubmissionID IN (SELECT SubmissionID FROM tblsubmission WHERE LecturerGuardianID = '${mentorId}' AND Status='Approved');`
+  )
+  const data = helper.emptyOrRows(rows)  ;
+  return data;
+}
+
 async function getTotalSubmissionGropByProdi(accessId) {
   const rows = await db.query(`SELECT 
   ROW_NUMBER() OVER(
@@ -482,6 +498,29 @@ GROUP BY
   return data;
 }
 
+async function getTotalSubmissionMentorship(mentorId) {
+  const rows = await db.query(`SELECT 
+  ROW_NUMBER() OVER(
+    ORDER BY 
+      (
+        SELECT 
+          NULL
+      )
+  ) AS id, 
+  p.Alias AS label, 
+  COUNT(*) AS value 
+FROM 
+  tblSubmission s 
+  INNER JOIN tblProdi p ON s.ProdiID = p.ProdiID 
+WHERE 
+  s.SubmissionID IN (SELECT SubmissionID FROM tblsubmission WHERE LecturerGuardianID = '${mentorId}' AND Status = 'Approved') 
+GROUP BY 
+  s.ProdiID;`);
+
+  const data = helper.emptyOrRows(rows);
+  return data;
+}
+
 module.exports = {
   create,
   createSubmissionApproval,
@@ -501,5 +540,7 @@ module.exports = {
   updateLucturerSubmission,
   deleteSubmission,
   getAllSubmissionStatusGroupByProdi,
-  getTotalSubmissionGropByProdi
+  getTotalSubmissionProgramTypeMentorship,
+  getTotalSubmissionGropByProdi,
+  getTotalSubmissionMentorship
 };
