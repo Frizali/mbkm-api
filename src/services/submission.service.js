@@ -40,8 +40,12 @@ async function approve(submissionId, accessId) {
     if(nextApprover){
         await submissionRepo.createSubmissionApproval(submissionId, nextApprover.ApproverID, 'Pending');
     }else{
+        let submission = await submissionRepo.getSubmissionById(submissionId, accessId)
+        let student = await userRepo.getUserByID(submission.StudentID)
+        student.UserPhoto = student.UserPhoto?.toString('base64')
+
         await submissionRepo.updateSubmissionStatus(submissionId,'Approved');
-        await mailService.sendFeedBackSubmission("m.fahrizalipradana@gmail.com");
+        await mailService.sendFeedBackSubmission(student,submission,"Approved");
     }
 
     let message = "Submission has been approved"
@@ -52,9 +56,14 @@ async function reject(submissionId, accessId, body) {
     let currApprover = await submissionRepo.getCurrentApprover(submissionId, accessId);
     if(!currApprover) throw new Error('You dont have access to reject this submission');
 
+    let submission = await submissionRepo.getSubmissionById(submissionId, accessId)
+    let student = await userRepo.getUserByID(submission.StudentID)
+    student.UserPhoto = student.UserPhoto?.toString('base64')
+
     await  Promise.all([
         submissionRepo.updateSubmissionApproval(submissionId, currApprover.ApproverID, body.note,'Rejected'),
-        submissionRepo.updateSubmissionStatus(submissionId,'Rejected')
+        submissionRepo.updateSubmissionStatus(submissionId,'Rejected'),
+        mailService.sendFeedBackSubmission(student,submission,"Rejected")
     ]);
 
     let message = "Submission has been rejected"

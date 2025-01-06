@@ -11,7 +11,7 @@ async function getLogbookBySubmissionID(submissionId) {
 
 async function getLogbookMentorship(mentorId) {
   const rows = await db.query(
-    `SELECT * FROM tbllogbook WHERE SubmissionID IN (SELECT SubmissionID FROM tblsubmission WHERE LecturerGuardianID = '${mentorId}')`
+    `SELECT pt.Color,l.* FROM tblsubmission s INNER JOIN tbllogbook l ON s.SubmissionID = l.SubmissionID INNER JOIN tblprogramtype pt ON s.ProgramType = pt.ProgramName WHERE s.SubmissionID IN (SELECT SubmissionID FROM tblsubmission WHERE LecturerGuardianID = '${mentorId}')`
   );
   const data = helper.emptyOrRows(rows);
   return data;

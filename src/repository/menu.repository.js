@@ -13,6 +13,12 @@ async function getMenu() {
   return data;
 }
 
+async function getRedirectMenuByAccessID(accessId) {
+  const rows = await db.query(`SELECT * FROM tblmenuaccess ma INNER JOIN tblmenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID = ${accessId} AND m.Redirect = 1`);
+  const data = helper.emptyOrRows(rows);
+  return data[0];
+}
+
 async function getMenuAccessDetailByAccessID(accessId) {
   const rows = await db.query(`SELECT m.BreadcrumbName AS Title,ma.* FROM tblmenuaccess ma INNER JOIN tblmenu m ON ma.MenuID = m.MenuID WHERE ma.AccessID=? AND m.MenuID <> m.ParentID;`,[accessId])
   const data = helper.emptyOrRows(rows);
@@ -52,5 +58,6 @@ module.exports = {
     getAccessByID,
     getMenu,
     getMenuAccess,
-    getMenuAccessDetailByAccessID
+    getMenuAccessDetailByAccessID,
+    getRedirectMenuByAccessID
 }

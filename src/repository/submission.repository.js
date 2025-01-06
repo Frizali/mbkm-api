@@ -462,8 +462,8 @@ async function getTotalSubmissionProgramTypeMentorship(mentorId) {
   const rows = await db.query(
     `SELECT
 'Tipe Kegiatan' AS Label,
-SUM(CASE WHEN ProgramType = 'Penilitian /Riset' THEN 1 ELSE 0 END) AS A,
-SUM(CASE WHEN ProgramType = 'Proyek Kemanusiaan' THEN 1 ELSE 0 END) AS B,
+SUM(CASE WHEN ProgramType = 'Proyek Kemanusiaan' THEN 1 ELSE 0 END) AS A,
+SUM(CASE WHEN ProgramType = 'Kegiatan Wirausaha' THEN 1 ELSE 0 END) AS B,
 SUM(CASE WHEN ProgramType = 'Studi /Proyek Independen' THEN 1 ELSE 0 END) AS C,
 SUM(CASE WHEN ProgramType = 'Magang Praktik Kerja' THEN 1 ELSE 0 END) AS D,
 SUM(CASE WHEN ProgramType = 'Asistensi Mengajar di Satuan Pendidikan' THEN 1 ELSE 0 END) AS E,

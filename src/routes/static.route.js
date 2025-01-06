@@ -5,6 +5,7 @@ const authenticateToken = require('../middlewares/authenticateToken.middleware')
 
 // Menu
 router.get('/menu', authenticateToken.authenticateToken, staticController.getMenu);
+router.get('/redirect-menu', authenticateToken.authenticateToken, staticController.getRedirectMenuByAccessID);
 router.get('/menu/menu-access-detail/:accessId', staticController.getMenuAccessDetailByAccessID);
 // Breadcrumb
 router.get('/breadcrumb', staticController.getBreadcrumbPath);

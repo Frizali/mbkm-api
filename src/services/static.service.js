@@ -69,6 +69,10 @@ async function getMenuAccessDetailByAccessID(accessId) {
   return await menuRepo.getMenuAccessDetailByAccessID(accessId);
 }
 
+async function getRedirectMenuByAccessID(accessId) {
+  return await menuRepo.getRedirectMenuByAccessID(accessId);
+}
+
 // Access
 async function getRoleDetail() {
   let [roles,userAvatar] = await Promise.all([
@@ -93,5 +97,6 @@ module.exports = {
   getBreadcrumbPath,
   getRoleDetail,
   getMenuAccessDetailByAccessID,
+  getRedirectMenuByAccessID,
   getUserByAccessID,
 };

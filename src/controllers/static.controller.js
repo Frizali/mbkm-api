@@ -72,6 +72,15 @@ async function getMenuAccessByAccessId(req, res, next) {
   }
 }
 
+async function getRedirectMenuByAccessID(req, res, next) {
+  try {
+    res.json(await staticService.getRedirectMenuByAccessID(req.user.accessId));
+  } catch (err) {
+    console.error(`Error while getting redirect menu`, err.message);
+    next(err);
+  }
+}
+
 module.exports = {
     getMenu,
     getBreadcrumbPath,
@@ -79,6 +88,7 @@ module.exports = {
     updateColumnWidth,
     getRoleDetail,
     getMenuAccessDetailByAccessID,
+    getRedirectMenuByAccessID,
     getUserByAccessID,
     getMenuAccessByAccessId
 }
