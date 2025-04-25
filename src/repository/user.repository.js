@@ -11,8 +11,8 @@ async function getUserByEmailOrName(user) {
 
 async function createUser(user, password) {
   const result = await db.query(
-    `INSERT INTO tbluser (UserID, Name, ProdiID, Email, Password, AccessID) VALUES(?,?,?,?,?,?)`,
-    [user.userId, user.name, user.prodiId, user.email, password, '1']
+    `INSERT INTO tbluser (UserID, Name, ProdiID, Email, Password, AccessID, Kontak, TempatTanggalLahir) VALUES(?,?,?,?,?,?,?,?)`,
+    [user.userId, user.name, user.prodiId, user.email, password, '1', user.kontak, user.tempattanggallahir]
   );
 
   let message = "Error in submit Submission";
@@ -31,7 +31,9 @@ async function getUserByID(userId) {
   u.Email, 
   u.ProdiID, 
   u.UserPhoto,
-  p.ProdiName
+  p.ProdiName,
+  u.Kontak,
+  u.TempatTanggalLahir
 FROM 
   tbluser u 
   INNER JOIN tblprodi p ON u.ProdiID = p.ProdiID 
@@ -42,7 +44,7 @@ FROM
 }
 
 async function getUserByAccessID(accessId) {
-  const result = await db.query(`SELECT UserID,Name,ProdiID,UserPhoto,Email FROM tbluser WHERE AccessID = ${accessId}`)
+  const result = await db.query(`SELECT UserID,Name,ProdiID,UserPhoto,Email,Kontak,TempatTanggalLahir FROM tbluser WHERE AccessID = ${accessId}`)
 
   return helper.emptyOrRows(result)
 }
